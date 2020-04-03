@@ -23,6 +23,7 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+const PrivateKeyProvider = require("../node_modules/truffle-privatekey-provider");
 
 module.exports = {
   /**
@@ -47,7 +48,14 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "5777",       // Any network (default: none)
     },
-
+    kovan: {
+      provider: () => new PrivateKeyProvider("privkey", `https://kovan.infura.io/v3/598efca7168947c6a186e2f85b600be1`),
+      network_id: 42,       // Ropsten's id
+      gas: 8500000,        // Ropsten has a lower block limit than mainnet
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: false     // Skip dry run before migrations? (default: false for public nets )
+     },
     // Another network with more advanced options...
     // advanced: {
       // port: 8777,             // Custom port
@@ -60,14 +68,7 @@ module.exports = {
 
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    // ropsten: {
-      // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
-      // network_id: 3,       // Ropsten's id
-      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
-      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-      // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
+    // 
 
     // Useful for private networks
     // private: {

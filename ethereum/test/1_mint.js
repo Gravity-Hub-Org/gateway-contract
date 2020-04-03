@@ -49,7 +49,6 @@ contract("Mint test", async accounts => {
         assert.equal(res.logs[0].args.status, status.slice(3,4));
         assert.equal(res.logs[0].args.requestHash, requestHash);
     }
-
     it("Mint", async () => {
         requestHash = await mint();
     });

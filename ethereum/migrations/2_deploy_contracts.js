@@ -1,5 +1,5 @@
 const Supersymmetry = artifacts.require("./Supersymmetry.sol");
 
 module.exports = async function(deployer, network, accounts) {
-    await deployer.deploy(Supersymmetry, [accounts[0], accounts[1],accounts[2],accounts[3],accounts[4]]);
+    await deployer.deploy(Supersymmetry, ["0x25513f13e9a69dcf2925BDfcED50C13709554358", "0xe2AD6550287D3AB7AA0cf44A0a15B1946C0D8De5", "0x25513f13e9a69dcf2925BDfcED50C13709554358", "0x25513f13e9a69dcf2925BDfcED50C13709554358", "0x25513f13e9a69dcf2925BDfcED50C13709554358"], 2);
 };

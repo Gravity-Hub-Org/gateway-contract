@@ -55,13 +55,6 @@ func getRqAmount(requestId: String) = getNumberByKey(getRqAmountKey(requestId))
 #-------------------Callable---------------------------
 
 @Callable(i)
-func testFaucet() = {
-    TransferSet([
-      ScriptTransfer(i.caller, 1000000000, assetId)
-    ])
-}
-
-@Callable(i)
 func createLockRequest(recipient: String) = {
     let pmt = extract(i.payment);
     let requestId = toBase58String(keccak256(fromBase58String(toString(this)) + i.caller.bytes + i.transactionId + toBytes(recipient)))
@@ -96,30 +89,6 @@ func changeStatus(requestHash: String, signsString: String, status: Int) = {
     if(count < bftCoefficient) 
         then throw("count is less 3")
     else if(getRqOwner(requestHash) == "")
-        then throw("request is not exists")
-    else if(getRqStatus(requestHash) != NEW)
-        then throw("request is not exists")
-    else if(status != SUCCESS && status != REJECTED)
-        then throw("invalid status")
-    else {
-        let owner = addressFromStringValue(getRqOwner(requestHash))
-        let type = getRqType(requestHash)
-        let amount = getRqAmount(requestHash)
-
-        ScriptResult(
-            WriteSet([
-                DataEntry(getRqStatusKey(requestHash), status)
-            ]),
-            TransferSet([
-                ScriptTransfer(owner, if ((status == REJECTED && type == LOCK) || (status == SUCCESS && type == UNLOCK)) then amount else 0, assetId)
-            ])
-        )
-    }
-}
-
-@Callable(i)
-func changeStatusTest(requestHash: String, status: Int) = {
-    if(getRqOwner(requestHash) == "")
         then throw("request is not exists")
     else if(getRqStatus(requestHash) != NEW)
         then throw("request is not exists")

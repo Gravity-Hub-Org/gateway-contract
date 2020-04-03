@@ -24,12 +24,20 @@ contract Supersymmetry {
         uint256 tokenAmount;
     }
 
-    address[] public admins;
+    address[5] public admins;
     address public tokenAddress;
+    uint8 public bftCoefficent;
 
-    constructor(address[5] memory newAdmins) public {
-        admins = newAdmins;
+    constructor(address[5] memory newAdmins, uint8 newBftCoefficent) public {
+        require(newAdmins[0] != address(0x00), "empty address");
+        require(newAdmins[1] != address(0x00), "empty address");
+        require(newAdmins[2] != address(0x00), "empty address");
+        require(newAdmins[3] != address(0x00), "empty address");
+        require(newAdmins[4] != address(0x00), "empty address");
+
         tokenAddress = address(new Token());
+        bftCoefficent = newBftCoefficent;
+        admins = newAdmins;
     }
 
     event NewRequest(bytes32 requestHash, address owner, string target);
@@ -64,25 +72,6 @@ contract Supersymmetry {
         return requestHash;
     }
 
-    function changeStatusTest(bytes32 requestHash, uint8 intStatus) public {
-        require(requests[requestHash].status == Status.New, "status is now new");
-        require(intStatus != uint8(Status.None), "invalid status");
-        require(intStatus != uint8(Status.New), "invalid status");
-
-
-        Status status = Status(intStatus);
-        if (intStatus == uint8(Status.Success)) {
-            if (requests[requestHash].rType == Type.Mint) {
-                require(Token(tokenAddress).mint(requests[requestHash].owner, requests[requestHash].tokenAmount), "invalid balance");
-            }
-        } else if (intStatus == uint8(Status.Rejected)) {
-            if (requests[requestHash].rType == Type.Burn) {
-                require(Token(tokenAddress).transferFrom(address(this), requests[requestHash].owner, requests[requestHash].tokenAmount), "invalid balance");
-            }
-        }
-        requests[requestHash].status = status;
-        emit StatusChanged(requestHash, status);
-    }
     function changeStatus(bytes32 requestHash, uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s, uint8 intStatus) public {
         require(requests[requestHash].status == Status.New, "status is now new");
         require(intStatus != uint8(Status.None), "invalid status");
@@ -94,7 +83,7 @@ contract Supersymmetry {
                 v[i], r[i], s[i]) == admins[i] ? 1 : 0;
         }
 
-        require(count >= 3, "admins vote count is less 3");
+        require(count >= bftCoefficent, "admins vote count is less bftCoefficent");
       
         Status status = Status(intStatus);
         if (intStatus == uint8(Status.Success)) {
