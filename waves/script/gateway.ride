@@ -5,6 +5,9 @@
 # Smart Contract Implementing Bonds Auction in the Orderbook of Neutrino Protocol 
 #
 
+#-------------------Constants---------------------------
+let WAVES = "WAVES"
+
 #-------------------Base functions----------------------
 func getNumberByKey(key: String) = {
     match getInteger(this, key) {
@@ -19,112 +22,229 @@ func getStringByKey(key: String) = {
     }
 }
 
+func extractAssetId(assetId: ByteVector | Unit) = {
+     match assetId {
+            case assetIdBytes:ByteVector => toBase58String(assetIdBytes)
+            case _ => WAVES
+    }
+}
+
 #------Order statuses------
 let NONE = 0
 let NEW = 1
 let REJECTED = 2
 let SUCCESS = 3
+let RETURNED = 4
 
 let LOCK = 0
 let UNLOCK = 1
-#-------------------Constructor-------------------------
-let AssetIdKey = "asset_id"
+let MINT = 2
+let BURN = 3
 
-#-------------------Keys--------------------------------
+let NativeToken = 0
+let InputToken = 1
+
+
+#-------------------Constructo--------------------------
 let AdminsKey = "admins"
 let BftCoefficientKey = "bftCoefficient"
+let RequestTimeoutKey = "rq_timeout"
+# erc20_address_WAVES = ercTokenAddress
+# asset_type__WAVES = 0 (NativeToken)
+# asset_status_WAVES = 3 (SUCCESS)
+# asset_decimals__WAVES = 8 
+
+#-------------------Keys--------------------------------
+let FirstElementKey = "first_element"
+let LastElementKey = "last_element"
 
 func getRqStatusKey(requestId: String) = "status_" + requestId
+func getRqAssetIdKey(requestId: String) = "asset_id_" + requestId
 func getRqHeightKey(requestId: String) = "height_" + requestId
 func getRqTypeKey(requestId: String) = "type_" + requestId
 func getRqOwnerKey(requestId: String) = "owner_" + requestId
 func getRqTargetKey(requestId: String) = "target_" + requestId
 func getRqAmountKey(requestId: String) = "amount_" + requestId
 
+func getNextRqKey(requestId: String) = "next_rq_" + requestId
+func getPrevRqKey(requestId: String) = "prev_rq_" + requestId
+
+func getERC20AddressKey(assetId: String) = "erc20_address_" + assetId
+func getAssetTypeKey(assetId: String) = "asset_type_" + assetId
+func getAssetStatusKey(assetId: String) = "asset_status_" + assetId
+func getAssetDecimalsKey(assetId: String) = "asset_decimals_" + assetId
+
 #-------------------Global vars-------------------------
 let admins = getStringByKey(AdminsKey).split(",")
-let assetId = fromBase58String(getStringByKey(AssetIdKey))
 let bftCoefficient = getNumberByKey(BftCoefficientKey)
+let firstElement = getStringByKey(FirstElementKey)
+let lastElement = getStringByKey(LastElementKey)
+let requestTimeout = getNumberByKey(RequestTimeoutKey)
+
 #-------------------Get functions----------------------
 func getRqStatus(requestId: String) = getNumberByKey(getRqStatusKey(requestId))
 func getRqType(requestId: String) = getNumberByKey(getRqTypeKey(requestId))
 func getRqOwner(requestId: String) = getStringByKey(getRqOwnerKey(requestId))
 func getRqTarget(requestId: String) = getStringByKey(getRqTargetKey(requestId))
 func getRqAmount(requestId: String) = getNumberByKey(getRqAmountKey(requestId))
+func getRqAssetId(requestId: String) = getStringByKey(getRqAssetIdKey(requestId))
+func getRqHeight(requestId: String) = getNumberByKey(getRqHeightKey(requestId))
 
-#-------------------Callable---------------------------
+# List
+# 0 - 1 - 2 - 3
+# next counter+1
+func getNextRq(requestId: String) = getStringByKey(getNextRqKey(requestId))
+func getPrevRq(requestId: String) = getStringByKey(getPrevRqKey(requestId))
 
-@Callable(i)
-func createLockRequest(recipient: String) = {
-    let pmt = extract(i.payment);
-    let requestId = toBase58String(keccak256(fromBase58String(toString(this)) + i.caller.bytes + i.transactionId + toBytes(recipient)))
+func getERC20Address(assetId: String) = getStringByKey(getERC20AddressKey(assetId))
+func getAssetType(assetId: String) = getNumberByKey(getAssetTypeKey(assetId))
+func getAssetStatus(assetId: String) = getNumberByKey(getAssetStatusKey(assetId))
+func getAssetDecimals(assetId: String) = getNumberByKey(getAssetDecimalsKey(assetId))
 
-    if (pmt.assetId != assetId)
-        then throw("can use waves only")
-    else if(getRqOwner(requestId) != "")
-        then throw("request exists")
-    else {
-            WriteSet([
-                DataEntry(getRqStatusKey(requestId), NEW),
-                DataEntry(getRqTypeKey(requestId), LOCK),
-                DataEntry(getRqOwnerKey(requestId), toString(i.caller)),
-
-                DataEntry(getRqHeightKey(requestId), height),
-                DataEntry(getRqTargetKey(requestId), recipient),
-                DataEntry(getRqAmountKey(requestId), pmt.amount)
-            ])
-    }
+func isRqPastDue(requestId: String) = {
+    height > getRqHeight(requestId) + requestTimeout
 }
 
-@Callable(i)
-func changeStatus(requestHash: String, signsString: String, status: Int) = {
+
+#-------------------Other function---------------------
+func isValidSigns(msg: String, signsString: String) = {
     let signs = signsString.split(",")
-    let msg = requestHash + "_" + toString(status)
     let count =  (if sigVerify(toBytes(msg), fromBase58String(signs[0]), fromBase58String(admins[0])) then 1 else 0) +
         (if sigVerify(toBytes(msg), fromBase58String(signs[1]), fromBase58String(admins[1])) then 1 else 0) +
         (if sigVerify(toBytes(msg), fromBase58String(signs[2]), fromBase58String(admins[2])) then 1 else 0) +
         (if sigVerify(toBytes(msg), fromBase58String(signs[3]), fromBase58String(admins[3])) then 1 else 0) +
         (if sigVerify(toBytes(msg), fromBase58String(signs[4]), fromBase58String(admins[4])) then 1 else 0)
     
-    if(count < bftCoefficient) 
-        then throw("count is less 3")
-    else if(getRqOwner(requestHash) == "")
-        then throw("request is not exists")
-    else if(getRqStatus(requestHash) != NEW)
-        then throw("request is not exists")
+    count < bftCoefficient
+}
+
+
+#-------------------Callable---------------------------
+@Callable(i)
+func registerNewAsset(assetId: String, erc20: String, type: Int) = {
+    let bytesAssetId = fromBase58String(assetId)
+    if(getERC20Address(assetId) != "")
+        then throw("asset exists")
+    else if(getAssetStatus(assetId) != NEW)
+        then throw("asset is exist")
+    else if(type != NativeToken || type != InputToken)
+        then throw("invalid asset type")
+    else if(type == InputToken && extract(assetInfo(bytesAssetId)).quantity != assetBalance(this, bytesAssetId))
+        then throw("ivalid balance")
+    else if(type == NativeToken && !isDefined(assetInfo(bytesAssetId)))
+        then throw("ivalid assetId")
+    else {
+        WriteSet([
+            DataEntry(getERC20AddressKey(assetId), erc20),
+            DataEntry(getAssetTypeKey(assetId), type),
+            DataEntry(getAssetStatusKey(assetId), NEW),
+            DataEntry(getAssetDecimalsKey(assetId), extract(assetInfo(bytesAssetId)).decimals)
+        ])
+    }
+}
+
+@Callable(i)
+func changeAssetStatus(assetId: String, signsString: String, status: Int) = {
+    if(!isValidSigns(assetId + "_" + toString(status), signsString)) 
+        then throw("count is less bftCoefficient")
+    else if(getAssetStatus(assetId) != NEW)
+        then throw("invalid asset id")
     else if(status != SUCCESS && status != REJECTED)
         then throw("invalid status")
     else {
-        let owner = addressFromStringValue(getRqOwner(requestHash))
-        let type = getRqType(requestHash)
-        let amount = getRqAmount(requestHash)
+        WriteSet([
+            DataEntry(getAssetStatusKey(assetId), status)
+        ])
+    }
+}
 
+@Callable(i)
+func withdrawPastDueReqest(requestId: String) = {
+    if(!isRqPastDue(requestId))
+        then throw("rq not expire")
+    else if(getRqStatus(requestId) != NEW)
+        then throw("request not exists")
+    else {
+        let assetId = getRqAssetId(requestId)
         ScriptResult(
             WriteSet([
-                DataEntry(getRqStatusKey(requestHash), status)
+                DataEntry(getRqStatusKey(requestId), RETURNED)
             ]),
             TransferSet([
-                ScriptTransfer(owner, if ((status == REJECTED && type == LOCK) || (status == SUCCESS && type == UNLOCK)) then amount else 0, assetId)
+                ScriptTransfer(addressFromStringValue(getRqOwner(requestId)), getRqAmount(requestId), if assetId == WAVES then unit else fromBase58String(getRqAssetId(requestId)))
             ])
         )
     }
 }
 
 @Callable(i)
-func createUnlockRequest(sender: String, amount: Int) = {
-    let requestId = toBase58String(keccak256(fromBase58String(toString(this)) + i.caller.bytes + i.transactionId + toBytes(sender) + toBytes(amount)))
+func createRequest(target: String, type: Int, amountOrNull: Int, asssetIdOrNull: String) = {
+    let pmt = extract(i.payment);
+    let requestId = toBase58String(keccak256(fromBase58String(toString(this)) + i.caller.bytes + i.transactionId + toBytes(target) + toBytes(type)))
+    let assetId = if type == LOCK || type == BURN then extractAssetId(pmt.assetId) else asssetIdOrNull
+    let amount = if type == LOCK || type == BURN then pmt.amount else amountOrNull
+    let owner = toString(i.caller)
+    let tokenType = getAssetType(assetId)
 
-    if(getRqOwner(requestId) != "")
+    if (getAssetStatus(assetId) != SUCCESS)
+        then throw("invalid asset id")
+    else if(getRqOwner(requestId) != owner)
         then throw("request exists")
+    else if(amount == 0)
+        then throw("invalid amount")
+    else if(type != LOCK && type != BURN && type != MINT && type != UNLOCK)
+        then throw("invalid type")
+    else if(tokenType == NativeToken && (type == BURN || type == MINT))
+        then throw("rq type is not equals token type")
+    else if(tokenType == InputToken && (type == LOCK || type == UNLOCK))
+        then throw("rq type is not equals token type")
     else {
-            WriteSet([
-                DataEntry(getRqStatusKey(requestId), NEW),
-                DataEntry(getRqTypeKey(requestId), UNLOCK),
-                DataEntry(getRqOwnerKey(requestId), toString(i.caller)),
+        WriteSet([
+            DataEntry(FirstElementKey, if firstElement == "" then requestId else firstElement),
+            DataEntry(getNextRqKey(lastElement), if firstElement == "" then "" else requestId),
+            DataEntry(getPrevRqKey(requestId), if firstElement == "" then "" else requestId),
+            DataEntry(LastElementKey, requestId),
 
-                DataEntry(getRqHeightKey(requestId), height),
-                DataEntry(getRqTargetKey(requestId), sender),
-                DataEntry(getRqAmountKey(requestId), amount)
+            DataEntry(getRqStatusKey(requestId), NEW),
+            DataEntry(getRqTypeKey(requestId), type),
+            DataEntry(getRqOwnerKey(requestId), owner),
+            DataEntry(getRqAssetIdKey(requestId), assetId),
+
+            DataEntry(getRqHeightKey(requestId), height),
+            DataEntry(getRqTargetKey(requestId), target),
+            DataEntry(getRqAmountKey(requestId), amount)
+        ])
+    }
+}
+
+
+@Callable(i)
+func changeStatus(requestId: String, signsString: String, status: Int) = {
+    if(!isValidSigns(requestId + "_" + toString(status), signsString)) 
+        then throw("count is less bftCoefficien")
+    else if(getRqOwner(requestId) == "")
+        then throw("request is not exists")
+    else if(getRqStatus(requestId) != NEW)
+        then throw("request is not exists")
+    else if(isRqPastDue(requestId))
+        then throw("rq expire")
+    else if(status != SUCCESS && status != REJECTED)
+        then throw("invalid status")
+    else {
+        let owner = addressFromStringValue(getRqOwner(requestId))
+        let type = getRqType(requestId)
+        let amount = getRqAmount(requestId)
+
+        let IsRejected = (status == REJECTED && (type == LOCK|| type == BURN))
+        let IsSuccess = (status == SUCCESS && (type == UNLOCK || type == MINT))
+        let assetId = getRqAssetId(requestId)
+        ScriptResult(
+            WriteSet([
+                DataEntry(getRqStatusKey(requestId), status)
+            ]),
+            TransferSet([
+                ScriptTransfer(owner, if (IsRejected || IsSuccess) then amount else 0, if assetId == WAVES then unit else fromBase58String(assetId))
             ])
+        )
     }
 }
