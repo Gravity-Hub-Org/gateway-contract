@@ -49,7 +49,7 @@ module.exports = {
       network_id: "5777",       // Any network (default: none)
     },
     kovan: {
-      provider: () => new PrivateKeyProvider("privkey", `https://kovan.infura.io/v3/598efca7168947c6a186e2f85b600be1`),
+      provider: () => new PrivateKeyProvider("", `https://kovan.infura.io/v3/598efca7168947c6a186e2f85b600be1`),
       network_id: 42,       // Ropsten's id
       gas: 8500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)

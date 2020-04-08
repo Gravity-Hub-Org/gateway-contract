@@ -21,11 +21,16 @@ contract Supersymmetry {
         require(newAdmins[2] != address(0x00), "empty address");
         require(newAdmins[3] != address(0x00), "empty address");
         require(newAdmins[4] != address(0x00), "empty address");
+ 
+     //   address tokenAddress = address(new Token("WAVES", "WAVES", 8));
+     //   tokens[tokenAddress] = Models.Token("WAVES", Models.TokenType.InputToken, Models.Status.Success, 8);
 
         tokens[address(0x00)] = Models.Token(ethAssetId, Models.TokenType.NativeToken, Models.Status.Success, 18);
         timeout = newTimeout;
         bftCoefficent = newBftCoefficent;
         admins = newAdmins;
+
+       
     }
     
     function registerNativeToken(address tokenAddress, string memory assetId) public {
