@@ -78,13 +78,13 @@ contract Supersymmetry {
         require(requests[requestHash].status == Models.Status.None, "request exist");
 
         requests[requestHash] = Models.Request(
-            {status: Models.Status.New, rType: rqType, owner: msg.sender, target: target, height: block.number, tokenAmount: amount, tokenAddress: address(0x00) });
+            {status: Models.Status.New, rType: rqType, owner: msg.sender, target: target, height: block.number, tokenAmount: amount, tokenAddress: address(0x00), targetRqId: "" });
         emit NewRequest(requestHash, msg.sender, target);
         return requestHash;
     }
 
     function createTokenRequest(string memory target, Models.RqType rqType,
-            uint256 amount, address tokenAddress) public returns (bytes32) {
+            uint256 amount, address tokenAddress, string memory requestIdOrNull) public returns (bytes32) {
 
         require(tokenAddress != address(0x00), "invalid tokenAddress");
         require(tokens[tokenAddress].status == Models.Status.Success, "ivalid tokenAddress");
@@ -98,12 +98,12 @@ contract Supersymmetry {
         require((rqType == Models.RqType.Burn || rqType == Models.RqType.Lock) &&
             Token(tokenAddress).transferFrom(msg.sender, address(this), amount), "invalid balance");
 
-
         bytes32 requestHash = sha256(abi.encodePacked(this, msg.sender, target, amount, block.number));
         require(requests[requestHash].status == Models.Status.None, "request exist");
 
         requests[requestHash] = Models.Request(
-            {status: Models.Status.New, rType: rqType, owner: msg.sender, target: target, height: block.number, tokenAmount: amount, tokenAddress: tokenAddress });
+            {status: Models.Status.New, rType: rqType, owner: msg.sender, target: target, height: block.number, tokenAmount: amount, tokenAddress: tokenAddress,
+                targetRqId: rqType == Models.RqType.Unlock || rqType == Models.RqType.Mint ? requestIdOrNull : "" });
         emit NewRequest(requestHash, msg.sender, target);
         return requestHash;
     }

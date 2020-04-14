@@ -19,6 +19,7 @@ library Models {
         NativeToken,
         InputToken
     }
+
     struct Token {
         string assetId;
         TokenType tokenType;
@@ -34,5 +35,6 @@ library Models {
         string target;
         uint256 tokenAmount;
         address tokenAddress;
+        string targetRqId;
     }
 }
