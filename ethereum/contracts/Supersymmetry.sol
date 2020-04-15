@@ -5,34 +5,39 @@ import "./Models.sol";
 
 contract Supersymmetry {
     event NewRequest(bytes32 requestHash, address owner, string target);
+    event NewApprovedToken(address tokenAddress);
     event StatusChanged(bytes32 requestHash, Models.Status status);
     event Mint(bytes32 requestHash, address owner, uint amount);
     event Return(bytes32 requestHash, address owner, uint amount);
 
-    uint timeout;
+    uint8 timeout;
     address[5] public admins;
     uint8 public bftCoefficent;
+    bool public isWavesTokenExist;
     mapping(bytes32 => Models.Request) public requests;
     mapping(address => Models.Token) public tokens;
 
-    constructor(address[5] memory newAdmins, uint8 newBftCoefficent, string memory ethAssetId, uint newTimeout) public {
+    constructor(address[5] memory newAdmins, uint8 newBftCoefficent, string memory ethAssetId, uint8 newTimeout) public {
         require(newAdmins[0] != address(0x00), "empty address");
         require(newAdmins[1] != address(0x00), "empty address");
         require(newAdmins[2] != address(0x00), "empty address");
         require(newAdmins[3] != address(0x00), "empty address");
         require(newAdmins[4] != address(0x00), "empty address");
  
-     //   address tokenAddress = address(new Token("WAVES", "WAVES", 8));
-     //   tokens[tokenAddress] = Models.Token("WAVES", Models.TokenType.InputToken, Models.Status.Success, 8);
-
+       
         tokens[address(0x00)] = Models.Token(ethAssetId, Models.TokenType.NativeToken, Models.Status.Success, 18);
         timeout = newTimeout;
         bftCoefficent = newBftCoefficent;
         admins = newAdmins;
-
-       
     }
     
+    function newWavesToken() public {
+        require(isWavesTokenExist == false, "waves token exist");
+        address tokenAddress = address(new Token("WAVES", "WAVES", 8));
+        tokens[tokenAddress] = Models.Token("WAVES", Models.TokenType.InputToken, Models.Status.Success, 8);
+        isWavesTokenExist = true;
+        emit NewApprovedToken(tokenAddress);
+    }
     function registerNativeToken(address tokenAddress, string memory assetId) public {
         require(tokens[tokenAddress].status == Models.Status.None, "ivalid tokenAddress");
         tokens[tokenAddress] = Models.Token(assetId, Models.TokenType.NativeToken, Models.Status.New, Token(tokenAddress).decimals());
@@ -56,6 +61,7 @@ contract Supersymmetry {
         require(count >= bftCoefficent, "admins vote count is less bftCoefficent");
 
         tokens[tokenAddress].status = status;
+        emit NewApprovedToken(tokenAddress);
     }
 
     function withdrawPastDueReqest(bytes32 requestHash) public {

@@ -1,7 +1,7 @@
 const wvs = 10 ** 8;
 
 describe('Deploy script', async function () {
-    let wavesERC20Address = ""
+    let wavesERC20Address = "0x9dD08557224d379335B22f0C7199608B9e5Af73B"
     let ethAssetId = "89LVNfmKavK1zNpKswUo3rJ72GJfyJcYPij6DMvxfr4S"
     let seed = "contract#687fd090"
 

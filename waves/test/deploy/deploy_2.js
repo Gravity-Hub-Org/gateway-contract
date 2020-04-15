@@ -1,7 +1,7 @@
 const wvs = 10 ** 8;
 
 describe('Deploy script', async function () {
-    let seed = "contract#687fd090"
+    let seed = "contract#3dc511c"
 
     it('Deploy contract', async function () {
         const setScriptTx = setScript({ script: compile(file("../script/gateway.ride")), fee: 1400000,}, seed); 

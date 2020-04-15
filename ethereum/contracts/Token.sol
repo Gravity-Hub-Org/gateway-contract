@@ -17,7 +17,7 @@ contract Token is ERC20, MinterRole {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
-        _addMinter(_msgSender());
+    //     _addMinter(_msgSender());
     }
 
     /**
