@@ -1,0 +1,14 @@
+{
+  "EthNodeUrl": "http://127.0.0.1:9545/",
+  "WavesNodeUrl": "http://127.0.0.1:6869",
+  "ChainId": "R",
+  "ScriptFile": "gateway.data",
+  "DistributorWavesSeed": "",
+  "WavesAdmins": [
+  ],
+  "EthereumAdmins": [
+  ],
+  "BftCoefficient": 1,
+  "RqTimeout": 30,
+  "EthereumPrivKey": ""
+}

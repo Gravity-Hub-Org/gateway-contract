@@ -1,0 +1,47 @@
+{-# STDLIB_VERSION 4 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+#
+# Smart Contract Implementing Bonds Auction in the Orderbook of Neutrino Protocol 
+#
+
+#-------------------Constants---------------------------
+
+
+#-------------------Base functions----------------------
+func getNumberByKey(key: String) = {
+    valueOrElse(getInteger(this, key), 0)
+}
+func getStringByKey(key: String) = {
+    valueOrElse(getString(this, key), "")
+}
+
+#-------------------Constructo--------------------------
+
+
+#-------------------Keys--------------------------------
+let TimeoutNewRoundKey = "timeout_new_round"
+let RoundEndKey = "round_end"
+let RandomKey = "random_key"
+
+#-------------------Global vars-------------------------
+let timeoutNewRound = getNumberByKey(TimeoutNewRoundKey)
+let roundEnd = getNumberByKey(RoundEndKey)
+let random = getStringByKey(RandomKey)
+
+#-------------------Callable---------------------------
+
+@Callable(i)
+func generateNewRound(assetId: String, erc20: String, type: Int) = {
+    if height <= roundEnd 
+        then throw("wait new round")
+    else {
+        let blockInfo = value(blockInfoByHeight(height))
+        
+        [
+            StringEntry(RandomKey, toBase58String(blockInfo.generationSignature)),
+            IntegerEntry(RoundEndKey, height + timeoutNewRound)
+        ]
+    }
+}

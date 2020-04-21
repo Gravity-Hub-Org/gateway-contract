@@ -1,4 +1,4 @@
-pragma solidity >=0.5.16 <=0.6.4;
+pragma solidity >=0.5.16 <=0.6.6;
 
 import "../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../../node_modules/@openzeppelin/contracts/access/roles/MinterRole.sol";

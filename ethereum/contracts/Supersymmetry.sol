@@ -1,4 +1,4 @@
-pragma solidity >=0.5.16 <=0.6.4;
+pragma solidity >=0.5.16 <=0.6.6;
 
 import "./Token.sol";
 import "./Models.sol";
@@ -80,7 +80,7 @@ contract Supersymmetry {
         require(rqType == Models.RqType.Lock || rqType == Models.RqType.Unlock, "rq type is not equals token type");
 
         uint amount = rqType == Models.RqType.Lock ? msg.value : unlockAmount;
-        bytes32 requestHash = sha256(abi.encodePacked(this, msg.sender, target, amount, block.number));
+        bytes32 requestHash = sha256(abi.encodePacked(msg.sender, target, amount, block.number));
         require(requests[requestHash].status == Models.Status.None, "request exist");
 
         requests[requestHash] = Models.Request(
@@ -96,15 +96,17 @@ contract Supersymmetry {
         require(tokens[tokenAddress].status == Models.Status.Success, "ivalid tokenAddress");
         require(amount > 0, "value less or equals 0");
 
-        require(tokens[tokenAddress].tokenType == Models.TokenType.NativeToken &&
-            (rqType == Models.RqType.Lock || rqType == Models.RqType.Unlock), "rq type is not equals token type");
-        require(tokens[tokenAddress].tokenType == Models.TokenType.InputToken &&
-            (rqType == Models.RqType.Burn || rqType == Models.RqType.Mint), "rq type is not equals token type");
+        if (tokens[tokenAddress].tokenType == Models.TokenType.NativeToken) {
+            require(rqType == Models.RqType.Lock || rqType == Models.RqType.Unlock, "rq type is not equals token type");
+        } else if(tokens[tokenAddress].tokenType == Models.TokenType.InputToken) {
+            require(rqType == Models.RqType.Burn || rqType == Models.RqType.Mint, "rq type is not equals token type");
+        }
 
-        require((rqType == Models.RqType.Burn || rqType == Models.RqType.Lock) &&
-            Token(tokenAddress).transferFrom(msg.sender, address(this), amount), "invalid balance");
+        if (rqType == Models.RqType.Burn || rqType == Models.RqType.Lock) {
+            require(Token(tokenAddress).transferFrom(msg.sender, address(this), amount), "invalid balance");
+        }
 
-        bytes32 requestHash = sha256(abi.encodePacked(this, msg.sender, target, amount, block.number));
+        bytes32 requestHash = sha256(abi.encodePacked(msg.sender, target, amount, block.number));
         require(requests[requestHash].status == Models.Status.None, "request exist");
 
         requests[requestHash] = Models.Request(

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ventuary-lab/gateway-contract#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
+    "@waves/surfboard": "^1.11.7",
     "truffle-privatekey-provider": "^1.3.0"
   },
   "devDependencies": {

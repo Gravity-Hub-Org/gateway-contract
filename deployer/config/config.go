@@ -11,7 +11,8 @@ type Config struct {
 	ChainId              string
 	ScriptFile           string
 	DistributorWavesSeed string
-	Admins               []string
+	EthereumAdmins       []string
+	WavesAdmins          []string
 	BftCoefficient       int64
 	RqTimeout            int64
 	EthereumPrivKey      string

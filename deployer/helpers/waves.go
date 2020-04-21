@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"bytes"
+	"context"
 	"deployer/models"
 	"encoding/json"
 	"errors"
@@ -19,11 +20,18 @@ const (
 )
 
 func IsUnconfirmedTx(nodeUrl string, id string) (bool, error) {
-	_, code, err := sendRequest("GET", nodeUrl+"/transactions/unconfirmed/info"+id, nil, "")
+	_, code, err := sendRequest("GET", nodeUrl+"/transactions/unconfirmed/info/"+id, nil, "")
 	if err != nil && code != 404 {
 		return true, err
 	}
+	return code == 200, nil
+}
 
+func Broadcast(nodeUrl string, body []byte) (bool, error) {
+	_, code, err := sendRequest("POST", nodeUrl+"/transactions/broadcast", body, "")
+	if err != nil && code != 404 {
+		return true, err
+	}
 	return code == 200, nil
 }
 
@@ -39,7 +47,7 @@ func GetStateByAddress(nodeUrl string, address string) (map[string]models.State,
 	return states.Map(), nil
 }
 
-func WaitTx(client *client.Client, id *crypto.Digest) <-chan error {
+func WaitTx(client *client.Client, id *crypto.Digest, ctx context.Context) <-chan error {
 	out := make(chan error)
 
 	go func() {
@@ -52,7 +60,7 @@ func WaitTx(client *client.Client, id *crypto.Digest) <-chan error {
 			}
 
 			if un == false {
-				tx, _, err := client.Transactions.Info(nil, *id)
+				tx, _, err := client.Transactions.Info(ctx, *id)
 				if err != nil {
 					out <- err
 				}
