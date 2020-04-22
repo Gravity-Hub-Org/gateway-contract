@@ -9,22 +9,20 @@ library Models {
         Returned
     }
 
+    enum TokenType {
+        None,
+        Internal,
+        External
+    }
+
     enum RqType {
         Lock,
-        Unlock,
-        Mint,
         Burn
-    }
-    enum TokenType {
-        NativeToken,
-        InputToken
     }
 
     struct Token {
-        string assetId;
+        address tokenAddress;
         TokenType tokenType;
-        Status status;
-        uint8 decimals;
     }
 
     struct Request {
@@ -35,6 +33,5 @@ library Models {
         string target;
         uint256 tokenAmount;
         address tokenAddress;
-        string targetRqId;
     }
 }

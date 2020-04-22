@@ -1,21 +1,21 @@
 {
   "contractName": "Models",
   "abi": [],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol\":\"Models\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol\":{\"keccak256\":\"0x1649ba33fd3e309198c3b214a98ee8b0e41b0f935b65a5f0ae8e52bac0b25996\",\"urls\":[\"bzz-raw://b5db27445b80952b2c5dca1bf0c1336c65f30bf20bb6f45b2f2bd2ccaf35a9a2\",\"dweb:/ipfs/QmUuASGmA79cxgVQcRzf95rN3xG7EcF59vKuPtX4etLKr8\"]}},\"version\":1}",
-  "bytecode": "0x60556023600b82828239805160001a607314601657fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a723158204500b67c16868171eacab07f7611501280fdd297585096b4c18710ec23b7db9864736f6c63430005100032",
-  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a723158204500b67c16868171eacab07f7611501280fdd297585096b4c18710ec23b7db9864736f6c63430005100032",
-  "sourceMap": "35:633:1:-;;132:2:-1;166:7;155:9;146:7;137:37;255:7;249:14;246:1;241:23;235:4;232:33;222:2;;269:9;222:2;293:9;290:1;283:20;323:4;314:7;306:22;347:7;338;331:24",
-  "deployedSourceMap": "35:633:1:-;;;;;;;;",
-  "source": "pragma solidity >=0.5.16 <=0.6.6;\n\nlibrary Models {\n    enum Status {\n        None,\n        New,\n        Rejected,\n        Success,\n        Returned\n    }\n\n    enum RqType {\n        Lock,\n        Unlock,\n        Mint,\n        Burn\n    }\n    enum TokenType {\n        NativeToken,\n        InputToken\n    }\n\n    struct Token {\n        string assetId;\n        TokenType tokenType;\n        Status status;\n        uint8 decimals;\n    }\n\n    struct Request {\n        Status status;\n        RqType rType;\n        address payable owner;\n        uint256 height;\n        string target;\n        uint256 tokenAmount;\n        address tokenAddress;\n        string targetRqId;\n    }\n}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol\":\"Models\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol\":{\"keccak256\":\"0x7e8ce8113f41409c2cdc7f8e36cee3bd720510707db884640d4910e7992103a8\",\"urls\":[\"bzz-raw://fe794a395d8daa242ccfd0d3a7a0f99e15b036b2a25a24107057e8de61fb63ce\",\"dweb:/ipfs/QmQimD4sSXD27ZVmGJtpYNogcefQCrJ9a2oM4xP2XZv3Rw\"]}},\"version\":1}",
+  "bytecode": "0x60556023600b82828239805160001a607314601657fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a72315820103dbd07d89237afa63d7392040a3c924f0d22bbf413e95080c907167f19bcaf64736f6c63430005100032",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a72315820103dbd07d89237afa63d7392040a3c924f0d22bbf413e95080c907167f19bcaf64736f6c63430005100032",
+  "sourceMap": "35:545:1:-;;132:2:-1;166:7;155:9;146:7;137:37;255:7;249:14;246:1;241:23;235:4;232:33;222:2;;269:9;222:2;293:9;290:1;283:20;323:4;314:7;306:22;347:7;338;331:24",
+  "deployedSourceMap": "35:545:1:-;;;;;;;;",
+  "source": "pragma solidity >=0.5.16 <=0.6.6;\n\nlibrary Models {\n    enum Status {\n        None,\n        New,\n        Rejected,\n        Success,\n        Returned\n    }\n\n    enum TokenType {\n        None,\n        Internal,\n        External\n    }\n\n    enum RqType {\n        Lock,\n        Burn\n    }\n\n    struct Token {\n        address tokenAddress;\n        TokenType tokenType;\n    }\n\n    struct Request {\n        Status status;\n        RqType rType;\n        address payable owner;\n        uint256 height;\n        string target;\n        uint256 tokenAmount;\n        address tokenAddress;\n    }\n}",
   "sourcePath": "/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol",
   "ast": {
     "absolutePath": "/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol",
     "exportedSymbols": {
       "Models": [
-        99
+        92
       ]
     },
-    "id": 100,
+    "id": 93,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -38,9 +38,9 @@
         "contractKind": "library",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 99,
+        "id": 92,
         "linearizedBaseContracts": [
-          99
+          92
         ],
         "name": "Models",
         "nodeType": "ContractDefinition",
@@ -85,84 +85,79 @@
             "src": "56:98:1"
           },
           {
-            "canonicalName": "Models.RqType",
-            "id": 69,
+            "canonicalName": "Models.TokenType",
+            "id": 68,
             "members": [
               {
                 "id": 65,
-                "name": "Lock",
+                "name": "None",
                 "nodeType": "EnumValue",
-                "src": "182:4:1"
+                "src": "185:4:1"
               },
               {
                 "id": 66,
-                "name": "Unlock",
+                "name": "Internal",
                 "nodeType": "EnumValue",
-                "src": "196:6:1"
+                "src": "199:8:1"
               },
               {
                 "id": 67,
-                "name": "Mint",
+                "name": "External",
                 "nodeType": "EnumValue",
-                "src": "212:4:1"
-              },
-              {
-                "id": 68,
-                "name": "Burn",
-                "nodeType": "EnumValue",
-                "src": "226:4:1"
-              }
-            ],
-            "name": "RqType",
-            "nodeType": "EnumDefinition",
-            "src": "160:76:1"
-          },
-          {
-            "canonicalName": "Models.TokenType",
-            "id": 72,
-            "members": [
-              {
-                "id": 70,
-                "name": "NativeToken",
-                "nodeType": "EnumValue",
-                "src": "266:11:1"
-              },
-              {
-                "id": 71,
-                "name": "InputToken",
-                "nodeType": "EnumValue",
-                "src": "287:10:1"
+                "src": "217:8:1"
               }
             ],
             "name": "TokenType",
             "nodeType": "EnumDefinition",
-            "src": "241:62:1"
+            "src": "160:71:1"
+          },
+          {
+            "canonicalName": "Models.RqType",
+            "id": 71,
+            "members": [
+              {
+                "id": 69,
+                "name": "Lock",
+                "nodeType": "EnumValue",
+                "src": "259:4:1"
+              },
+              {
+                "id": 70,
+                "name": "Burn",
+                "nodeType": "EnumValue",
+                "src": "273:4:1"
+              }
+            ],
+            "name": "RqType",
+            "nodeType": "EnumDefinition",
+            "src": "237:46:1"
           },
           {
             "canonicalName": "Models.Token",
-            "id": 81,
+            "id": 76,
             "members": [
               {
                 "constant": false,
-                "id": 74,
-                "name": "assetId",
+                "id": 73,
+                "name": "tokenAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "332:14:1",
+                "scope": 76,
+                "src": "312:20:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_string_storage_ptr",
-                  "typeString": "string"
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
                 },
                 "typeName": {
-                  "id": 73,
-                  "name": "string",
+                  "id": 72,
+                  "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "332:6:1",
+                  "src": "312:7:1",
+                  "stateMutability": "nonpayable",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_string_storage_ptr",
-                    "typeString": "string"
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
                   }
                 },
                 "value": null,
@@ -170,39 +165,50 @@
               },
               {
                 "constant": false,
-                "id": 76,
+                "id": 75,
                 "name": "tokenType",
                 "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "356:19:1",
+                "scope": 76,
+                "src": "342:19:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_TokenType_$72",
+                  "typeIdentifier": "t_enum$_TokenType_$68",
                   "typeString": "enum Models.TokenType"
                 },
                 "typeName": {
                   "contractScope": null,
-                  "id": 75,
+                  "id": 74,
                   "name": "TokenType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 72,
-                  "src": "356:9:1",
+                  "referencedDeclaration": 68,
+                  "src": "342:9:1",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_TokenType_$72",
+                    "typeIdentifier": "t_enum$_TokenType_$68",
                     "typeString": "enum Models.TokenType"
                   }
                 },
                 "value": null,
                 "visibility": "internal"
-              },
+              }
+            ],
+            "name": "Token",
+            "nodeType": "StructDefinition",
+            "scope": 92,
+            "src": "289:79:1",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "Models.Request",
+            "id": 91,
+            "members": [
               {
                 "constant": false,
                 "id": 78,
                 "name": "status",
                 "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "385:13:1",
+                "scope": 91,
+                "src": "399:13:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -215,7 +221,7 @@
                   "name": "Status",
                   "nodeType": "UserDefinedTypeName",
                   "referencedDeclaration": 64,
-                  "src": "385:6:1",
+                  "src": "399:6:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_enum$_Status_$64",
                     "typeString": "enum Models.Status"
@@ -227,90 +233,25 @@
               {
                 "constant": false,
                 "id": 80,
-                "name": "decimals",
-                "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "408:14:1",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_uint8",
-                  "typeString": "uint8"
-                },
-                "typeName": {
-                  "id": 79,
-                  "name": "uint8",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "408:5:1",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint8",
-                    "typeString": "uint8"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              }
-            ],
-            "name": "Token",
-            "nodeType": "StructDefinition",
-            "scope": 99,
-            "src": "309:120:1",
-            "visibility": "public"
-          },
-          {
-            "canonicalName": "Models.Request",
-            "id": 98,
-            "members": [
-              {
-                "constant": false,
-                "id": 83,
-                "name": "status",
-                "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "460:13:1",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_Status_$64",
-                  "typeString": "enum Models.Status"
-                },
-                "typeName": {
-                  "contractScope": null,
-                  "id": 82,
-                  "name": "Status",
-                  "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 64,
-                  "src": "460:6:1",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_Status_$64",
-                    "typeString": "enum Models.Status"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              },
-              {
-                "constant": false,
-                "id": 85,
                 "name": "rType",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "483:12:1",
+                "scope": 91,
+                "src": "422:12:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_RqType_$69",
+                  "typeIdentifier": "t_enum$_RqType_$71",
                   "typeString": "enum Models.RqType"
                 },
                 "typeName": {
                   "contractScope": null,
-                  "id": 84,
+                  "id": 79,
                   "name": "RqType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 69,
-                  "src": "483:6:1",
+                  "referencedDeclaration": 71,
+                  "src": "422:6:1",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_RqType_$69",
+                    "typeIdentifier": "t_enum$_RqType_$71",
                     "typeString": "enum Models.RqType"
                   }
                 },
@@ -319,11 +260,11 @@
               },
               {
                 "constant": false,
-                "id": 87,
+                "id": 82,
                 "name": "owner",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "505:21:1",
+                "scope": 91,
+                "src": "444:21:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -331,10 +272,10 @@
                   "typeString": "address payable"
                 },
                 "typeName": {
-                  "id": 86,
+                  "id": 81,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "505:15:1",
+                  "src": "444:15:1",
                   "stateMutability": "payable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address_payable",
@@ -346,11 +287,11 @@
               },
               {
                 "constant": false,
-                "id": 89,
+                "id": 84,
                 "name": "height",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "536:14:1",
+                "scope": 91,
+                "src": "475:14:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -358,10 +299,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 88,
+                  "id": 83,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "536:7:1",
+                  "src": "475:7:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -372,11 +313,11 @@
               },
               {
                 "constant": false,
-                "id": 91,
+                "id": 86,
                 "name": "target",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "560:13:1",
+                "scope": 91,
+                "src": "499:13:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -384,10 +325,10 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 90,
+                  "id": 85,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
-                  "src": "560:6:1",
+                  "src": "499:6:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_storage_ptr",
                     "typeString": "string"
@@ -398,11 +339,11 @@
               },
               {
                 "constant": false,
-                "id": 93,
+                "id": 88,
                 "name": "tokenAmount",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "583:19:1",
+                "scope": 91,
+                "src": "522:19:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -410,10 +351,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 92,
+                  "id": 87,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "583:7:1",
+                  "src": "522:7:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -424,11 +365,11 @@
               },
               {
                 "constant": false,
-                "id": 95,
+                "id": 90,
                 "name": "tokenAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "612:20:1",
+                "scope": 91,
+                "src": "551:20:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -436,10 +377,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 94,
+                  "id": 89,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "612:7:1",
+                  "src": "551:7:1",
                   "stateMutability": "nonpayable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
@@ -448,55 +389,29 @@
                 },
                 "value": null,
                 "visibility": "internal"
-              },
-              {
-                "constant": false,
-                "id": 97,
-                "name": "targetRqId",
-                "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "642:17:1",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_string_storage_ptr",
-                  "typeString": "string"
-                },
-                "typeName": {
-                  "id": 96,
-                  "name": "string",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "642:6:1",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_string_storage_ptr",
-                    "typeString": "string"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
               }
             ],
             "name": "Request",
             "nodeType": "StructDefinition",
-            "scope": 99,
-            "src": "435:231:1",
+            "scope": 92,
+            "src": "374:204:1",
             "visibility": "public"
           }
         ],
-        "scope": 100,
-        "src": "35:633:1"
+        "scope": 93,
+        "src": "35:545:1"
       }
     ],
-    "src": "0:668:1"
+    "src": "0:580:1"
   },
   "legacyAST": {
     "absolutePath": "/home/cryptobadboy/github/GravityHub/gateway-contract/ethereum/contracts/Models.sol",
     "exportedSymbols": {
       "Models": [
-        99
+        92
       ]
     },
-    "id": 100,
+    "id": 93,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -519,9 +434,9 @@
         "contractKind": "library",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 99,
+        "id": 92,
         "linearizedBaseContracts": [
-          99
+          92
         ],
         "name": "Models",
         "nodeType": "ContractDefinition",
@@ -566,84 +481,79 @@
             "src": "56:98:1"
           },
           {
-            "canonicalName": "Models.RqType",
-            "id": 69,
+            "canonicalName": "Models.TokenType",
+            "id": 68,
             "members": [
               {
                 "id": 65,
-                "name": "Lock",
+                "name": "None",
                 "nodeType": "EnumValue",
-                "src": "182:4:1"
+                "src": "185:4:1"
               },
               {
                 "id": 66,
-                "name": "Unlock",
+                "name": "Internal",
                 "nodeType": "EnumValue",
-                "src": "196:6:1"
+                "src": "199:8:1"
               },
               {
                 "id": 67,
-                "name": "Mint",
+                "name": "External",
                 "nodeType": "EnumValue",
-                "src": "212:4:1"
-              },
-              {
-                "id": 68,
-                "name": "Burn",
-                "nodeType": "EnumValue",
-                "src": "226:4:1"
-              }
-            ],
-            "name": "RqType",
-            "nodeType": "EnumDefinition",
-            "src": "160:76:1"
-          },
-          {
-            "canonicalName": "Models.TokenType",
-            "id": 72,
-            "members": [
-              {
-                "id": 70,
-                "name": "NativeToken",
-                "nodeType": "EnumValue",
-                "src": "266:11:1"
-              },
-              {
-                "id": 71,
-                "name": "InputToken",
-                "nodeType": "EnumValue",
-                "src": "287:10:1"
+                "src": "217:8:1"
               }
             ],
             "name": "TokenType",
             "nodeType": "EnumDefinition",
-            "src": "241:62:1"
+            "src": "160:71:1"
+          },
+          {
+            "canonicalName": "Models.RqType",
+            "id": 71,
+            "members": [
+              {
+                "id": 69,
+                "name": "Lock",
+                "nodeType": "EnumValue",
+                "src": "259:4:1"
+              },
+              {
+                "id": 70,
+                "name": "Burn",
+                "nodeType": "EnumValue",
+                "src": "273:4:1"
+              }
+            ],
+            "name": "RqType",
+            "nodeType": "EnumDefinition",
+            "src": "237:46:1"
           },
           {
             "canonicalName": "Models.Token",
-            "id": 81,
+            "id": 76,
             "members": [
               {
                 "constant": false,
-                "id": 74,
-                "name": "assetId",
+                "id": 73,
+                "name": "tokenAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "332:14:1",
+                "scope": 76,
+                "src": "312:20:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_string_storage_ptr",
-                  "typeString": "string"
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
                 },
                 "typeName": {
-                  "id": 73,
-                  "name": "string",
+                  "id": 72,
+                  "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "332:6:1",
+                  "src": "312:7:1",
+                  "stateMutability": "nonpayable",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_string_storage_ptr",
-                    "typeString": "string"
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
                   }
                 },
                 "value": null,
@@ -651,39 +561,50 @@
               },
               {
                 "constant": false,
-                "id": 76,
+                "id": 75,
                 "name": "tokenType",
                 "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "356:19:1",
+                "scope": 76,
+                "src": "342:19:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_TokenType_$72",
+                  "typeIdentifier": "t_enum$_TokenType_$68",
                   "typeString": "enum Models.TokenType"
                 },
                 "typeName": {
                   "contractScope": null,
-                  "id": 75,
+                  "id": 74,
                   "name": "TokenType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 72,
-                  "src": "356:9:1",
+                  "referencedDeclaration": 68,
+                  "src": "342:9:1",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_TokenType_$72",
+                    "typeIdentifier": "t_enum$_TokenType_$68",
                     "typeString": "enum Models.TokenType"
                   }
                 },
                 "value": null,
                 "visibility": "internal"
-              },
+              }
+            ],
+            "name": "Token",
+            "nodeType": "StructDefinition",
+            "scope": 92,
+            "src": "289:79:1",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "Models.Request",
+            "id": 91,
+            "members": [
               {
                 "constant": false,
                 "id": 78,
                 "name": "status",
                 "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "385:13:1",
+                "scope": 91,
+                "src": "399:13:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -696,7 +617,7 @@
                   "name": "Status",
                   "nodeType": "UserDefinedTypeName",
                   "referencedDeclaration": 64,
-                  "src": "385:6:1",
+                  "src": "399:6:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_enum$_Status_$64",
                     "typeString": "enum Models.Status"
@@ -708,90 +629,25 @@
               {
                 "constant": false,
                 "id": 80,
-                "name": "decimals",
-                "nodeType": "VariableDeclaration",
-                "scope": 81,
-                "src": "408:14:1",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_uint8",
-                  "typeString": "uint8"
-                },
-                "typeName": {
-                  "id": 79,
-                  "name": "uint8",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "408:5:1",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint8",
-                    "typeString": "uint8"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              }
-            ],
-            "name": "Token",
-            "nodeType": "StructDefinition",
-            "scope": 99,
-            "src": "309:120:1",
-            "visibility": "public"
-          },
-          {
-            "canonicalName": "Models.Request",
-            "id": 98,
-            "members": [
-              {
-                "constant": false,
-                "id": 83,
-                "name": "status",
-                "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "460:13:1",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_Status_$64",
-                  "typeString": "enum Models.Status"
-                },
-                "typeName": {
-                  "contractScope": null,
-                  "id": 82,
-                  "name": "Status",
-                  "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 64,
-                  "src": "460:6:1",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_Status_$64",
-                    "typeString": "enum Models.Status"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              },
-              {
-                "constant": false,
-                "id": 85,
                 "name": "rType",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "483:12:1",
+                "scope": 91,
+                "src": "422:12:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_enum$_RqType_$69",
+                  "typeIdentifier": "t_enum$_RqType_$71",
                   "typeString": "enum Models.RqType"
                 },
                 "typeName": {
                   "contractScope": null,
-                  "id": 84,
+                  "id": 79,
                   "name": "RqType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 69,
-                  "src": "483:6:1",
+                  "referencedDeclaration": 71,
+                  "src": "422:6:1",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_RqType_$69",
+                    "typeIdentifier": "t_enum$_RqType_$71",
                     "typeString": "enum Models.RqType"
                   }
                 },
@@ -800,11 +656,11 @@
               },
               {
                 "constant": false,
-                "id": 87,
+                "id": 82,
                 "name": "owner",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "505:21:1",
+                "scope": 91,
+                "src": "444:21:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -812,10 +668,10 @@
                   "typeString": "address payable"
                 },
                 "typeName": {
-                  "id": 86,
+                  "id": 81,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "505:15:1",
+                  "src": "444:15:1",
                   "stateMutability": "payable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address_payable",
@@ -827,11 +683,11 @@
               },
               {
                 "constant": false,
-                "id": 89,
+                "id": 84,
                 "name": "height",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "536:14:1",
+                "scope": 91,
+                "src": "475:14:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -839,10 +695,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 88,
+                  "id": 83,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "536:7:1",
+                  "src": "475:7:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -853,11 +709,11 @@
               },
               {
                 "constant": false,
-                "id": 91,
+                "id": 86,
                 "name": "target",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "560:13:1",
+                "scope": 91,
+                "src": "499:13:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -865,10 +721,10 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 90,
+                  "id": 85,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
-                  "src": "560:6:1",
+                  "src": "499:6:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_storage_ptr",
                     "typeString": "string"
@@ -879,11 +735,11 @@
               },
               {
                 "constant": false,
-                "id": 93,
+                "id": 88,
                 "name": "tokenAmount",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "583:19:1",
+                "scope": 91,
+                "src": "522:19:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -891,10 +747,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 92,
+                  "id": 87,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "583:7:1",
+                  "src": "522:7:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -905,11 +761,11 @@
               },
               {
                 "constant": false,
-                "id": 95,
+                "id": 90,
                 "name": "tokenAddress",
                 "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "612:20:1",
+                "scope": 91,
+                "src": "551:20:1",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -917,10 +773,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 94,
+                  "id": 89,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "612:7:1",
+                  "src": "551:7:1",
                   "stateMutability": "nonpayable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
@@ -929,46 +785,20 @@
                 },
                 "value": null,
                 "visibility": "internal"
-              },
-              {
-                "constant": false,
-                "id": 97,
-                "name": "targetRqId",
-                "nodeType": "VariableDeclaration",
-                "scope": 98,
-                "src": "642:17:1",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_string_storage_ptr",
-                  "typeString": "string"
-                },
-                "typeName": {
-                  "id": 96,
-                  "name": "string",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "642:6:1",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_string_storage_ptr",
-                    "typeString": "string"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
               }
             ],
             "name": "Request",
             "nodeType": "StructDefinition",
-            "scope": 99,
-            "src": "435:231:1",
+            "scope": 92,
+            "src": "374:204:1",
             "visibility": "public"
           }
         ],
-        "scope": 100,
-        "src": "35:633:1"
+        "scope": 93,
+        "src": "35:545:1"
       }
     ],
-    "src": "0:668:1"
+    "src": "0:580:1"
   },
   "compiler": {
     "name": "solc",
@@ -976,7 +806,7 @@
   },
   "networks": {},
   "schemaVersion": "3.1.0",
-  "updatedAt": "2020-04-18T22:01:26.551Z",
+  "updatedAt": "2020-04-22T23:07:38.301Z",
   "devdoc": {
     "methods": {}
   },
