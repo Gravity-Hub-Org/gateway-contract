@@ -34,10 +34,8 @@ let RETURNED = 4
 let LOCK = 0
 let BURN = 1
 
-let NativeToken = 0
-let InputToken = 1
-
-
+let INTERNAL = 1
+let EXTERNAL = 2
 #-------------------Constructo--------------------------
 let ValidatorsKey = "validator"
 #let BftCoefficientKey = "bft_coefficient"
@@ -64,12 +62,15 @@ func getRqOwnerKey(requestId: String) = "owner_" + requestId
 func getRqTargetKey(requestId: String) = "target_" + requestId
 func getRqAmountKey(requestId: String) = "amount_" + requestId
 
+func getStatusInternalRqKey(requestId: String) = "status_internal_rq_" + requestId
+
 func getNextRqKey(requestId: String) = "next_rq_" + requestId
 func getPrevRqKey(requestId: String) = "prev_rq_" + requestId
 
-func getAssetIdByERC20Key(erc20Address: String) = "asset_id_" + erc20Address
-func getAssetDecimalsKey(assetId: String) = "asset_decimals_" + assetId
 
+func getERC20ByAssetIdKey(assetId: String) = "erc_20_" + assetId
+func getAssetIdByERC20Key(erc20Address: String) = "asset_id_" + erc20Address
+func getTypeByERC20Key(erc20Address: String) = "erc_20_status_" + erc20Address
 
 #-------------------Global vars-------------------------
 let validators = getStringByKey(ValidatorsKey).split(",")
@@ -90,15 +91,16 @@ func getRqTarget(requestId: String) = getStringByKey(getRqTargetKey(requestId))
 func getRqAmount(requestId: String) = getNumberByKey(getRqAmountKey(requestId))
 func getRqAssetId(requestId: String) = getStringByKey(getRqAssetIdKey(requestId))
 func getRqHeight(requestId: String) = getNumberByKey(getRqHeightKey(requestId))
-
+func getStatusInternalRq(requestId: String) = getNumberByKey(getStatusInternalRqKey(requestId))
 # List
 # 0 - 1 - 2 - 3
 # next counter+1
 func getNextRq(requestId: String) = getStringByKey(getNextRqKey(requestId))
 func getPrevRq(requestId: String) = getStringByKey(getPrevRqKey(requestId))
 
-func getAssetIdByERC20(assetId: String) = getStringByKey(getAssetIdByERC20Key(assetId))
-func getAssetDecimals(assetId: String) = getNumberByKey(getAssetDecimalsKey(assetId))
+func getERC20ByAssetId(assetId: String) = getStringByKey(getERC20ByAssetIdKey(assetId))
+func getAssetIdByERC20(erc20Address: String) = getStringByKey(getAssetIdByERC20Key(erc20Address))
+func getTypeByERC20(erc20Address: String) = getNumberByKey(getTypeByERC20Key(erc20Address))
 
 func isRqPastDue(requestId: String) = {
     height > (getRqHeight(requestId) + requestTimeout)
@@ -107,82 +109,122 @@ func isRqPastDue(requestId: String) = {
 
 #-------------------Other function---------------------
 
-func indexToSting(index: Int) = {
+func indexToString(index: Int) = {
     "|" + toString(index) + "|"
 }
 
-func maxByIndex(aIndex: Int, bIndex: Int, values: List[Int]) = {
-    let aValue = if aIndex == -1 then -1000 else values[aIndex]
-    let bValue = if bIndex == -1 then -1000 else values[bIndex]
-    if  aValue == bValue then {
-        if aValue % 2 == 0 then aIndex else bIndex
-    } else if aValue > bValue then aIndex else bIndex
+func getDropedList(freeValidators: List[Int], dropIndex: Int) = {
+    [] 
+        ++ (if size(freeValidators) > 0 && freeValidators[0] == dropIndex then [] else [ freeValidators[0] ]) 
+        ++ (if size(freeValidators) > 1 && freeValidators[1] == dropIndex then [] else [ freeValidators[1] ]) 
+        ++ (if size(freeValidators) > 2 && freeValidators[2] == dropIndex then [] else [ freeValidators[2] ]) 
+        ++ (if size(freeValidators) > 3 && freeValidators[3] == dropIndex then [] else [ freeValidators[3] ]) 
+        ++ (if size(freeValidators) > 4 && freeValidators[4] == dropIndex then [] else [ freeValidators[4] ]) 
 }
-
-func topWithDrop(dropIndexs: String, randomValues: List[Int]) = {
-    let indexs = [
-        if contains(dropIndexs, indexToSting(0)) then -1 else 0,
-        if contains(dropIndexs, indexToSting(1)) then -1 else 1,
-        if contains(dropIndexs, indexToSting(2)) then -1 else 2,
-        if contains(dropIndexs, indexToSting(3)) then -1 else 3,
-        if contains(dropIndexs, indexToSting(4)) then -1 else 4
-    ]
-
-    maxByIndex(maxByIndex(maxByIndex(maxByIndex(indexs[0], indexs[1], randomValues), indexs[2], randomValues), indexs[3], randomValues), indexs[4], randomValues)
-}
-
 
 func isValidSigns(msg: String, signsString: String) = {
     let bytesRandom = fromBase58String(random)
     let randomValues = [
-        toInt(bytesRandom.take(1)),
-        toInt(bytesRandom.drop(1).take(1)),
-        toInt(bytesRandom.drop(2).take(1)),
-        toInt(bytesRandom.drop(3).take(1)),
-        toInt(bytesRandom.drop(4).take(1))
+        toInt(take(bytesRandom, 8)),
+        toInt(take(drop(bytesRandom, 8),8)),
+        toInt(take(drop(bytesRandom, 16),8))
     ]
 
-    let firstIndex = topWithDrop("", randomValues)
-    let twoIndex = topWithDrop(indexToSting(firstIndex), randomValues)
-    let threeIndex = topWithDrop(indexToSting(firstIndex) + indexToSting(twoIndex), randomValues)
+    let startValidators = [
+        0,
+        1,
+        2,
+        3,
+        4
+    ]
+
+    let firstValidatorIndex = randomValues[0] % 5
+    let validatorsOne = getDropedList(startValidators, firstValidatorIndex)
+    let twoValidatorIndex =  randomValues[1] % 4
+
+    let validatorsTwo = getDropedList(startValidators, firstValidatorIndex)
+    let threeValidatorIndex = randomValues[2] % 3
+
+
+    let one = startValidators[firstValidatorIndex]
+    let two = validatorsOne[twoValidatorIndex]
+    let three = validatorsTwo[threeValidatorIndex]
     
     let signs = signsString.split(",")
     let count = 
-        (if sigVerify(toBytes(msg), fromBase58String(signs[firstIndex]), fromBase58String(validators[firstIndex])) then 1 else 0) +
-        (if sigVerify(toBytes(msg), fromBase58String(signs[twoIndex]), fromBase58String(validators[twoIndex])) then 1 else 0) +
-        (if sigVerify(toBytes(msg), fromBase58String(signs[threeIndex]), fromBase58String(validators[threeIndex])) then 1 else 0) 
+        (if sigVerify(toBytes(msg), fromBase58String(signs[one]), fromBase58String(validators[one])) then 1 else 0) +
+        (if sigVerify(toBytes(msg), fromBase58String(signs[two]), fromBase58String(validators[two])) then 1 else 0) +
+        (if sigVerify(toBytes(msg), fromBase58String(signs[three]), fromBase58String(validators[three])) then 1 else 0) 
 
     count > 3
-}
-
-func createAsset(name: String, description: String, decimals: Int) = {
-    let issue = Issue(name, description, 2, decimals, true, unit, 0)
-    toBase58String(calculateAssetId(issue))
-}
-func createDataAssetId(erc20Address: String, assetId: String, name: String, description: String, decimals: Int) = {
-    [
-        StringEntry(getAssetIdByERC20Key(erc20Address), assetId),
-        IntegerEntry(getAssetDecimalsKey(assetId), decimals)
-    ]
 }
 
 #-------------------Callable---------------------------
 
 @Callable(i)
 func mint(rqHash: String, erc20Address: String, owner: String, amount: Int, signsString: String, initDataOrNull: String) = {
-    let storageAssetId = getAssetIdByERC20(erc20Address)
-    let dataArgs = initDataOrNull.split(SEPARATOR)
-    let assetId = if storageAssetId == "" then createAsset(dataArgs[0], dataArgs[1], parseIntValue(dataArgs[2])) else storageAssetId
-    let assetCreateResult = 
-        if storageAssetId == "" 
-            then createDataAssetId(erc20Address, assetId, dataArgs[0], dataArgs[1], parseIntValue(dataArgs[2]))
-        else []
-    
-    [
-        ScriptTransfer(addressFromStringValue(owner), amount, fromBase58String(assetId))
-    ] ++ assetCreateResult
+    let msg = toBase58String(keccak256(toBytes(rqHash + "_" + erc20Address + "_" + owner + "_" + toString(amount) + "_" + initDataOrNull + "_" + toString(EXTERNAL))))
+    if getStatusInternalRq(rqHash) == SUCCESS
+        then throw("invalid status")
+    else if !isValidSigns(msg, signsString)
+        then throw("invalid signs")
+    else {
+        let storageAssetId = getAssetIdByERC20(erc20Address)
+        let dataArgs = initDataOrNull.split(SEPARATOR)
+        let issue = if storageAssetId == "" then Issue(dataArgs[0], dataArgs[1], 2, parseIntValue(dataArgs[2]), true, unit, 0) else unit
+
+        let assetId = if storageAssetId == "" then toBase58String(calculateAssetId(value(issue))) else storageAssetId
+        let assetCreateResult = 
+            if storageAssetId == "" 
+                then 
+                    [
+                        StringEntry(getAssetIdByERC20Key(erc20Address), assetId),
+                        StringEntry(getERC20ByAssetIdKey(assetId), erc20Address),
+                        IntegerEntry(getTypeByERC20Key(erc20Address), EXTERNAL)
+                    ] :+ value(issue)
+            else []
+        
+        [
+            Reissue(fromBase58String(assetId), true, amount),
+            ScriptTransfer(addressFromStringValue(owner), amount, fromBase58String(assetId)),
+            IntegerEntry(getStatusInternalRqKey(rqHash), SUCCESS)
+        ] ++ assetCreateResult
+    }
 }
 
+
+@Callable(i)
+func unlock(rqHash: String, erc20Address: String, assetIdOrNull: String, owner: String, amount: Int, signsString: String) = {
+    let msg = toBase58String(keccak256(toBytes(rqHash + "_" + erc20Address + "_" + owner + "_" + toString(amount) + "_" + assetIdOrNull + "_" + toString(INTERNAL))))
+    if getStatusInternalRq(rqHash) == SUCCESS 
+        then throw("invalid status")
+    else if !isValidSigns(msg, signsString)
+        then throw("invalid signs")
+    else if getERC20ByAssetId(erc20Address) != "" && getTypeByERC20(erc20Address) != INTERNAL
+        then throw("Invalid erc20. Use mint func.")
+    else {
+        let storageAssetId = getAssetIdByERC20(erc20Address)
+        if storageAssetId == ""  && assetIdOrNull == ""
+            then throw("invalid assetId")
+        else {
+            let assetId = if storageAssetId == "" then assetIdOrNull else storageAssetId
+            let assetCreateResult = 
+                if storageAssetId == "" 
+                    then 
+                        [
+                            StringEntry(getAssetIdByERC20Key(erc20Address), assetId),
+                            StringEntry(getERC20ByAssetIdKey(assetId), erc20Address),
+                            IntegerEntry(getTypeByERC20Key(erc20Address), INTERNAL)
+                        ]
+                else []
+        
+            [
+                ScriptTransfer(addressFromStringValue(owner), amount, if assetId == WAVES then unit else fromBase58String(assetId)),
+                IntegerEntry(getStatusInternalRqKey(rqHash), SUCCESS)
+            ] ++ assetCreateResult
+        }
+    }
+}
 
 @Callable(i)
 func createBurnRequest(target: String) = {
@@ -240,8 +282,10 @@ func changeStatus(requestId: String, signsString: String, status: Int) = {
         let assetId = getRqAssetId(requestId)
         let transfer = 
             if status == REJECTED
-                then [ ScriptTransfer(addressFromStringValue(getRqOwner(requestId)), getRqAmount(requestId), 
-                            if assetId == WAVES then unit else fromBase58String(getRqAssetId(requestId))) ]
+                then [ 
+                        ScriptTransfer(addressFromStringValue(getRqOwner(requestId)), getRqAmount(requestId), 
+                            if assetId == WAVES then unit else fromBase58String(getRqAssetId(requestId))) 
+                     ]
             else []
 
         [

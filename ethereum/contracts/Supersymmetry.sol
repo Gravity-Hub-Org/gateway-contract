@@ -33,33 +33,23 @@ contract Supersymmetry {
         randomContractAddress = newRandomContractAddress;
     }
 
-  /*  function newWavesToken() public {
-        require(isWavesTokenExist == false, "waves token exist");
-        address tokenAddress = address(new Token("WAVES", "WAVES", 8));
-        tokens[tokenAddress] = Models.Token("WAVES", Models.TokenType.InputToken, Models.Status.Success, 8);
-        isWavesTokenExist = true;
-        emit NewApprovedToken(tokenAddress);
-    }*/
-/*
-    function registerNativeToken(address tokenAddress, string memory assetId) public {
-        require(tokens[tokenAddress].status == Models.Status.None, "ivalid tokenAddress");
-        tokens[tokenAddress] = Models.Token(assetId, Models.TokenType.NativeToken, Models.Status.New, Token(tokenAddress).decimals());
-    }
-
-    function registerInputToken(string memory assetId, string memory name, string memory symbol, uint8 decimals) public {
-        address tokenAddress = address(new Token(name, symbol, decimals));
-        tokens[tokenAddress] = Models.Token(assetId, Models.TokenType.InputToken, Models.Status.New, decimals);
-    }
-*/
-    function mint(bytes32 rqHash, string memory assetId, address owner, uint256 amount,
-        uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s, string memory name, string memory symbol, uint8 decimals) public {
+    function _requireValidSign(bytes32 message, uint8[5] memory v,
+        bytes32[5] memory r, bytes32[5] memory s) internal {
 
         int count = 0;
         for(uint i = 0; i < 5; i++) {
-            count += ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n33", abi.encodePacked(rqHash,
-                rqHash, assetId, owner, amount, name, symbol, decimals, Models.TokenType.External))),
+            count += ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", message)),
                 v[i], r[i], s[i]) == validators[i] ? 1 : 0;
         }
+
+        require(count > bftCoefficent, "invalid signs");
+    }
+
+    function mint(bytes32 rqHash, string memory assetId, address owner, uint256 amount,
+        uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s, string memory name, string memory symbol, uint8 decimals) public {
+
+        bytes32 message = keccak256(abi.encodePacked(rqHash, assetId, owner, amount, name, symbol, decimals, Models.TokenType.External));
+        _requireValidSign(message, v, r, s);
 
         address tokenAddress;
         if (assets[assetId].tokenType == Models.TokenType.None) {
