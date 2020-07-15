@@ -1,0 +1,24 @@
+{
+  "EthNodeUrl": "https://ropsten.infura.io/v3/598efca7168947c6a186e2f85b600be1",
+  "WavesNodeUrl": "http://waves-testnet.gravityhub.org",
+  "ChainId": "R",
+  "ScriptFile": "gateway.data",
+  "DistributorWavesSeed": "waves private node seed with waves tokens",
+  "WavesAdmins": [
+    "AXbaBkJNocyrVpwqTzD4TpUY8fQ6eeRto9k1m2bNCzXV",
+    "AXbaBkJNocyrVpwqTzD4TpUY8fQ6eeRto9k1m2bNCzXV",
+    "AXbaBkJNocyrVpwqTzD4TpUY8fQ6eeRto9k1m2bNCzXV",
+    "AXbaBkJNocyrVpwqTzD4TpUY8fQ6eeRto9k1m2bNCzXV",
+    "AXbaBkJNocyrVpwqTzD4TpUY8fQ6eeRto9k1m2bNCzXV"
+  ],
+  "EthereumAdmins": [
+    "0xd2ba9fdb5b3d9f8cd2efc4d164a509addeb48efa",
+    "0xd2ba9fdb5b3d9f8cd2efc4d164a509addeb48efa",
+    "0xd2ba9fdb5b3d9f8cd2efc4d164a509addeb48efa",
+    "0xd2ba9fdb5b3d9f8cd2efc4d164a509addeb48efa",
+    "0xd2ba9fdb5b3d9f8cd2efc4d164a509addeb48efa"
+  ],
+  "BftCoefficient": 1,
+  "RqTimeout": 30,
+  "EthereumPrivKey": "0x101ca0d8fbe1d869188f41e91974d8b86b9c226a703bb081864c12d9c9ebc6c7"
+}

@@ -222,7 +222,6 @@ func createRequest(target: String, type: Int, amountOrNull: Int, asssetIdOrNull:
     }
 }
 
-
 @Callable(i)
 func changeStatus(requestId: String, signsString: String, status: Int) = {
     if(!isValidSigns(requestId + "_" + toString(status), signsString)) 
