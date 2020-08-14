@@ -1,0 +1,20 @@
+version: '2.0'
+
+services: 
+    ganache:
+        build: docker/ganache
+        
+    truffle:
+        build: docker/truffle
+        links: 
+            - ganache
+        volumes: 
+            - ../../:/src:rw
+
+    golang:
+        image: golang
+        volumes: 
+            - ./go:/go/src/nebula-test:rw
+            - ./github.com:/go/src/github.com:rw
+            - ../../ethereum/nebula.json:/go/src/nebula-test/nebula.json:rw
+        command: sh -c "cd /go/src/nebula-test; go mod download; go test"
