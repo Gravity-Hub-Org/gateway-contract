@@ -5,7 +5,7 @@ import (
     "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"strings"
+    "strings"
 	"math/big"
 	"log"
 	"crypto/ecdsa"
@@ -32,6 +32,19 @@ func (caller *NebulaCaller) GetPulseHash(pulseNum *big.Int) ([32]byte) {
     var out [32]byte
     caller.contract.Call(nil, &out, "pulses", pulseNum)
     return out
+}
+
+func (caller *NebulaCaller) SendData(value uint64, blockNumber big.Int, subscriptionId [32]byte) (bool) {
+    privateKey, err := crypto.HexToECDSA(caller.OraclePK[0])
+    if err != nil {
+        log.Fatal(err)
+    }
+    auth := bind.NewKeyedTransactor(privateKey)
+    _, err = caller.contract.Transact(auth, "sendData", value, blockNumber, subscriptionId)
+    if err != nil {
+        return false
+    }
+    return true
 }
 
 func (caller *NebulaCaller) SignData(dataHash [32]byte, validSignsCount int) bool {

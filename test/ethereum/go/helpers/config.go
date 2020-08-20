@@ -14,8 +14,9 @@ type Config struct {
 type NebulaData struct {
     Abi string
     Address string
+    SubscriptionId string
+    MockAddress string
 }
-
 
 func LoadConfiguration() (Config, NebulaData) {
 	var config Config
