@@ -22,33 +22,62 @@ contract Supersymmetry is ISubscription {
         nebula = _nebula;
     }
 
+    function data2string(bytes32 d) internal pure returns (string memory) {
+        bytes memory b = new bytes(32);
+        for (uint i = 0; i < 8; i++) {
+            b[i] = d[i];
+        }
+        return string(b);
+    }
+
+    function data2address(bytes32 d) internal pure returns (address payable) {
+        return address(uint160(uint(d)));
+    }
+
+    function data2rqType(bytes32 dd) internal pure returns (Models.RqType) {
+        uint d = uint(dd);
+        if (d == 0) return Models.RqType.Lock;
+        if (d == 1) return Models.RqType.Burn;
+        revert("invalid rq type");
+    }
+
+    function data2status(bytes32 dd) internal pure returns (Models.Status) {
+        uint d = uint(dd);
+        if (d == 0) return Models.Status.None;
+        if (d == 1) return Models.Status.New;
+        if (d == 2) return Models.Status.Rejected;
+        if (d == 3) return Models.Status.Success;
+        if (d == 4) return Models.Status.Returned;
+        revert("invalid status");
+    }
+
     function attachData(bytes32[] memory data) public {
         require(msg.sender == nebula, "access denied");
         for (uint pos = 0; pos < data.length; ) {
             bytes32 action = data[pos]; pos++;
 
             if (action == bytes32("mint")) {
-                string memory assetId = string(data[pos]); pos++;
-                address owner = address(data[pos]); pos++;
-                uint amount = data[pos]; pos++;
-                string memory name = string(data[pos]); pos++;
-                string memory symbol = string(data[pos]); pos++;
-                uint decimals = data[pos]; pos++;
+                string memory assetId = data2string(data[pos]); pos++;
+                address owner = data2address(data[pos]); pos++;
+                uint amount = uint(data[pos]); pos++;
+                string memory name = data2string(data[pos]); pos++;
+                string memory symbol = data2string(data[pos]); pos++;
+                uint8 decimals = uint8(uint(data[pos])); pos++;
                 mint(assetId, owner, amount, name, symbol, decimals);
             }
 
             if (action == bytes32("unlock")) {
-                address tokenAddress = address(data[pos]); pos++;
-                string memory assetId = string(data[pos]); pos++;
-                address owner = address(data[pos]); pos++;
-                uint amount = data[pos]; pos++;
+                address tokenAddress = data2address(data[pos]); pos++;
+                string memory assetId = data2string(data[pos]); pos++;
+                address owner = data2address(data[pos]); pos++;
+                uint amount = uint(data[pos]); pos++;
                 unlock(tokenAddress, assetId, owner, amount);
             }
 
             if (action == bytes32("unlockEth")) {
-                string memory assetId = string(data[pos]); pos++;
-                address owner = address(data[pos]); pos++;
-                uint amount = data[pos]; pos++;
+                string memory assetId = data2string(data[pos]); pos++;
+                address payable owner = data2address(data[pos]); pos++;
+                uint amount = uint(data[pos]); pos++;
                 unlockEth(assetId, owner, amount);
             }
 
@@ -57,24 +86,24 @@ contract Supersymmetry is ISubscription {
             }
 
             if (action == bytes32("createEthRequest")) {
-                string memory target = string(data[pos]); pos++;
-                uint rqType = data[pos]; pos++;
-                uint amount = data[pos]; pos++;
+                string memory target = data2string(data[pos]); pos++;
+                Models.RqType rqType = data2rqType(data[pos]); pos++;
+                uint amount = uint(data[pos]); pos++;
                 createEthRequest(target, rqType, amount);
             }
             
             if (action == bytes32("createTokenRequest")) {
-                string memory target = string(data[pos]); pos++;
-                uint rqType = data[pos]; pos++;
-                uint amount = data[pos]; pos++;
-                address tokenAddress = address(data[pos]); pos++;
+                string memory target = data2string(data[pos]); pos++;
+                Models.RqType rqType = data2rqType(data[pos]); pos++;
+                uint amount = uint(data[pos]); pos++;
+                address tokenAddress = data2address(data[pos]); pos++;
 
-                createEthRequest(target, rqType, amount, tokenAddress);
+                createTokenRequest(target, rqType, amount, tokenAddress);
             }
             
             if (action == bytes32("changeStatus")) {
                 bytes32 rqHash = data[pos]; pos++;
-                uint status = data[pos]; pos++;
+                Models.Status status = data2status(data[pos]); pos++;
 
                 changeStatus(rqHash, status);
             }
