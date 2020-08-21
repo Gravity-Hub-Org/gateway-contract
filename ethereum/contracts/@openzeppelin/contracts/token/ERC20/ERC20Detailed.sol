@@ -1,9 +1,11 @@
-pragma solidity >=0.5.16 <=0.6.6;
+pragma solidity ^0.5.0;
 
-import "../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../../node_modules/@openzeppelin/contracts/access/roles/MinterRole.sol";
+import "./IERC20.sol";
 
-contract Token is ERC20, MinterRole {
+/**
+ * @dev Optional functions from the ERC20 standard.
+ */
+contract ERC20Detailed is IERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
@@ -17,7 +19,6 @@ contract Token is ERC20, MinterRole {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
-    //     _addMinter(_msgSender());
     }
 
     /**
@@ -49,10 +50,5 @@ contract Token is ERC20, MinterRole {
      */
     function decimals() public view returns (uint8) {
         return _decimals;
-    }
-  
-    function mint(address account, uint256 amount) public onlyMinter returns (bool) {
-        _mint(account, amount);
-        return true;
     }
 }

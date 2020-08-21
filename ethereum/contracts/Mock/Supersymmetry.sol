@@ -2,54 +2,88 @@ pragma solidity >=0.5.16 <=0.6.6;
 
 import "./Token.sol";
 import "./Models.sol";
+import "../interfaces/ISubscription.sol";
 
-contract Supersymmetry {
+contract Supersymmetry is ISubscription {
     event NewRequest(bytes32 requestHash, address owner, string target);
     event NewApprovedToken(address tokenAddress);
     event StatusChanged(bytes32 requestHash, Models.Status status);
     event Mint(bytes32 requestHash, address owner, uint amount);
     event Return(bytes32 requestHash, address owner, uint amount);
 
-    uint8 timeout;
-    address[5] public validators;
-    uint8 public bftCoefficent;
     bool public isWavesTokenExist;
-    address public randomContractAddress;
+    address nebula;
     mapping(bytes32 => Models.Request) public requests;
     mapping(bytes32 => bool) public externalRq;
     mapping(string => Models.Token) public assets;
     mapping(address => string) public assetIdByErc20;
 
-    constructor(address[5] memory newValidators, uint8 newBftCoefficent, uint8 newTimeout, address newRandomContractAddress) public {
-        require(newValidators[0] != address(0x00), "empty address");
-        require(newValidators[1] != address(0x00), "empty address");
-        require(newValidators[2] != address(0x00), "empty address");
-        require(newValidators[3] != address(0x00), "empty address");
-        require(newValidators[4] != address(0x00), "empty address");
-
-        timeout = newTimeout;
-        bftCoefficent = newBftCoefficent;
-        validators = newValidators;
-        randomContractAddress = newRandomContractAddress;
+    constructor(address _nebula) public {
+        nebula = _nebula;
     }
 
-    function _requireValidSign(bytes32 message, uint8[5] memory v,
-        bytes32[5] memory r, bytes32[5] memory s) internal {
+    function attachData(bytes32[] memory data) public {
+        require(msg.sender == nebula, "access denied");
+        for (uint pos = 0; pos < data.length; ) {
+            bytes32 action = data[pos]; pos++;
 
-        int count = 0;
-        for(uint i = 0; i < 5; i++) {
-            count += ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", message)),
-                v[i], r[i], s[i]) == validators[i] ? 1 : 0;
+            if (action == bytes32("mint")) {
+                string memory assetId = string(data[pos]); pos++;
+                address owner = address(data[pos]); pos++;
+                uint amount = data[pos]; pos++;
+                string memory name = string(data[pos]); pos++;
+                string memory symbol = string(data[pos]); pos++;
+                uint decimals = data[pos]; pos++;
+                mint(assetId, owner, amount, name, symbol, decimals);
+            }
+
+            if (action == bytes32("unlock")) {
+                address tokenAddress = address(data[pos]); pos++;
+                string memory assetId = string(data[pos]); pos++;
+                address owner = address(data[pos]); pos++;
+                uint amount = data[pos]; pos++;
+                unlock(tokenAddress, assetId, owner, amount);
+            }
+
+            if (action == bytes32("unlockEth")) {
+                string memory assetId = string(data[pos]); pos++;
+                address owner = address(data[pos]); pos++;
+                uint amount = data[pos]; pos++;
+                unlockEth(assetId, owner, amount);
+            }
+
+            if (action == bytes32("withdrawPastDueReqest")) {
+                withdrawPastDueReqest(data[pos++]);
+            }
+
+            if (action == bytes32("createEthRequest")) {
+                string memory target = string(data[pos]); pos++;
+                uint rqType = data[pos]; pos++;
+                uint amount = data[pos]; pos++;
+                createEthRequest(target, rqType, amount);
+            }
+            
+            if (action == bytes32("createTokenRequest")) {
+                string memory target = string(data[pos]); pos++;
+                uint rqType = data[pos]; pos++;
+                uint amount = data[pos]; pos++;
+                address tokenAddress = address(data[pos]); pos++;
+
+                createEthRequest(target, rqType, amount, tokenAddress);
+            }
+            
+            if (action == bytes32("changeStatus")) {
+                bytes32 rqHash = data[pos]; pos++;
+                uint status = data[pos]; pos++;
+
+                changeStatus(rqHash, status);
+            }
+            
         }
-
-        require(count > bftCoefficent, "invalid signs");
     }
 
-    function mint(bytes32 rqHash, string memory assetId, address owner, uint256 amount,
-        uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s, string memory name, string memory symbol, uint8 decimals) public {
-
-        bytes32 message = keccak256(abi.encodePacked(rqHash, assetId, owner, amount, name, symbol, decimals, Models.TokenType.External));
-        _requireValidSign(message, v, r, s);
+    function mint(string memory assetId, address owner, uint256 amount,
+        string memory name, string memory symbol, uint8 decimals) internal {
 
         address tokenAddress;
         if (assets[assetId].tokenType == Models.TokenType.None) {
@@ -62,19 +96,10 @@ contract Supersymmetry {
         }
 
         require(Token(tokenAddress).mint(owner, amount), "invalid mint");
-        externalRq[rqHash] = true;
+        // externalRq[rqHash] = true;
     }
 
-    function unlock(bytes32 rqHash, address tokenAddress, string memory assetId, address owner, uint256 amount,
-        uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s) public {
-
-        int count = 0;
-        for(uint i = 0; i < 5; i++) {
-            count += ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n33", abi.encodePacked(rqHash,
-                rqHash, assetId, owner, amount, tokenAddress, Models.TokenType.Internal))),
-                v[i], r[i], s[i]) == validators[i] ? 1 : 0;
-        }
-
+    function unlock(address tokenAddress, string memory assetId, address owner, uint256 amount) internal {
         if (assets[assetId].tokenType == Models.TokenType.None) {
             assets[assetId] = Models.Token(tokenAddress, Models.TokenType.Internal);
             assetIdByErc20[tokenAddress] = assetId;
@@ -83,19 +108,11 @@ contract Supersymmetry {
         }
 
         require(Token(tokenAddress).transferFrom(address(this), owner, amount), "invalid transfer");
-        externalRq[rqHash] = true;
+        // externalRq[rqHash] = true;
     }
 
-    function unlockEth(bytes32 rqHash, string memory assetId, address payable owner, uint256 amount,
-        uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s) public payable {
-
+    function unlockEth(string memory assetId, address payable owner, uint256 amount) internal {
         address tokenAddress = address(0x00);
-        int count = 0;
-        for(uint i = 0; i < 5; i++) {
-            count += ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n33", abi.encodePacked(rqHash,
-                rqHash, assetId, owner, amount, tokenAddress, Models.TokenType.Internal))),
-                v[i], r[i], s[i]) == validators[i] ? 1 : 0;
-        }
 
         if (assets[assetId].tokenType == Models.TokenType.None) {
             assets[assetId] = Models.Token(tokenAddress, Models.TokenType.Internal);
@@ -105,13 +122,12 @@ contract Supersymmetry {
         }
 
         owner.transfer(amount);
-        externalRq[rqHash] = true;
+        // externalRq[rqHash] = true;
     }
 
-
-    function withdrawPastDueReqest(bytes32 requestHash) public {
+    function withdrawPastDueReqest(bytes32 requestHash) internal {
         require(requests[requestHash].status == Models.Status.New, "request not exist");
-        require(block.number > requests[requestHash].height + timeout, "rq not expire");
+        // require(block.number > requests[requestHash].height + timeout, "rq not expire");
 
         if (requests[requestHash].tokenAddress == address(0x00)) {
             requests[requestHash].owner.transfer(requests[requestHash].tokenAmount);
@@ -121,7 +137,7 @@ contract Supersymmetry {
         requests[requestHash].status = Models.Status.Returned;
     }
 
-    function createEthRequest(string memory target, Models.RqType rqType, uint unlockAmount) public payable returns (bytes32) {
+    function createEthRequest(string memory target, Models.RqType rqType, uint unlockAmount) internal returns (bytes32) {
         require(rqType == Models.RqType.Lock, "rq type is not equals token type");
 
         uint amount = rqType == Models.RqType.Lock ? msg.value : unlockAmount;
@@ -134,7 +150,7 @@ contract Supersymmetry {
         return requestHash;
     }
 
-    function createTokenRequest(string memory target, Models.RqType rqType, uint256 amount, address tokenAddress) public returns (bytes32) {
+    function createTokenRequest(string memory target, Models.RqType rqType, uint256 amount, address tokenAddress) internal returns (bytes32) {
 
         require(tokenAddress != address(0x00), "invalid tokenAddress");
         require(amount > 0, "value less or equals 0");
@@ -152,19 +168,12 @@ contract Supersymmetry {
         return requestHash;
     }
 
-    function changeStatus(bytes32 requestHash, uint8[5] memory v, bytes32[5] memory r, bytes32[5] memory s, Models.Status status) public {
+    function changeStatus(bytes32 requestHash, Models.Status status) internal {
         require(requests[requestHash].status == Models.Status.New, "status is now new");
         require(status == Models.Status.Success || status == Models.Status.Rejected, "invalid status");
-        require(block.number <= requests[requestHash].height + timeout, "rq expire");
+        // require(block.number <= requests[requestHash].height + timeout, "rq expire");
 
         address tokenAddress = requests[requestHash].tokenAddress;
-        int count = 0;
-        for(uint i = 0; i < 5; i++) {
-            count += ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n33", abi.encodePacked(requestHash, uint8(status)))),
-                v[i], r[i], s[i]) == validators[i] ? 1 : 0;
-        }
-
-        require(count >= bftCoefficent, "admins vote count is less bftCoefficent");
 
         if (status == Models.Status.Rejected) {
              if (requests[requestHash].rType == Models.RqType.Burn) {
