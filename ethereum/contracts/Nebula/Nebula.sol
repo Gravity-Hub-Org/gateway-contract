@@ -3,7 +3,7 @@ pragma solidity >=0.4.21 <0.7.0;
 import "../Gravity/Gravity.sol";
 import "../libs/Queue.sol";
 import "./NModels.sol";
-import "../Mock/SubMock.sol";
+import "../IBPort/IBPort.sol";
 
 contract Nebula {
     event NewPulse(uint256 height, bytes32 dataHash);
@@ -55,13 +55,13 @@ contract Nebula {
         emit NewPulse(block.number, dataHash);
     }
 
-    function sendData(uint64 value, uint256 blockNumber, bytes32 subscriptionId) public {
+    function sendData(bytes32[] memory value, uint256 blockNumber, bytes32 subscriptionId) public {
         require(blockNumber <= block.number + 1, "invalid block number");
         require(isPublseSubSent[blockNumber][subscriptionId] == false, "sub sent");
         isPublseSubSent[blockNumber][subscriptionId] = true;
 
         uint256 startBalance = address(this).balance;
-        SubMock(subscriptions[subscriptionId].contractAddress).attachData(value);
+        IBPort(subscriptions[subscriptionId].contractAddress).attachData(value);
         uint256 endBalance = address(this).balance;
         uint256 profit = endBalance-startBalance;
 
