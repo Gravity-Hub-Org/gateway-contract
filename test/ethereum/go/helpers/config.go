@@ -14,7 +14,9 @@ type NebulaData struct {
     Abi string
     Address string
     SubscriptionId string
-    MockAddress string
+    IbportAddress string
+	TokenAddress string
+	TokenAbi string
 }
 
 func LoadConfiguration() (Config, NebulaData, error) {

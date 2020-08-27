@@ -35,7 +35,7 @@ func (caller *NebulaCaller) GetPulseHash(pulseNum *big.Int) [32]byte {
 	return out
 }
 
-func (caller *NebulaCaller) SendData(value uint64, blockNumber big.Int, subscriptionId [32]byte) (bool) {
+func (caller *NebulaCaller) SendData(value []byte, blockNumber *big.Int, subscriptionId [32]byte) (bool) {
     privateKey, err := crypto.HexToECDSA(caller.OraclePK[0])
     if err != nil {
         log.Fatal(err)
@@ -43,6 +43,7 @@ func (caller *NebulaCaller) SendData(value uint64, blockNumber big.Int, subscrip
     auth := bind.NewKeyedTransactor(privateKey)
     _, err = caller.contract.Transact(auth, "sendData", value, blockNumber, subscriptionId)
     if err != nil {
+		log.Fatal(err)
         return false
     }
     return true

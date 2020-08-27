@@ -1,8 +1,32 @@
-const Supersymmetry = artifacts.require("./Supersymmetry.sol");
+const fs = require("fs");
+const Nebula = artifacts.require("./Nebula/Nebula.sol");
+const Gravity = artifacts.require("./Gravity/Gravity.sol");
+const IBPort = artifacts.require("./IBPort/IBPort.sol");
+const Token = artifacts.require("./IBPort/Token.sol");
+const Queue = artifacts.require("./libs/QueueLib");
 
 module.exports = async function(deployer, network, accounts) {
-    let ethAssetId = "DcegJK3HbAKtrqwjQq6AcbGxDNZ8y4obNLJ5SuwiV6dT"
-    await deployer.deploy(Supersymmetry, 
-        ["0xe2d3f4c3170abad93339c1251b530b7f87ced3ad", "0xe2AD6550287D3AB7AA0cf44A0a15B1946C0D8De5", "0x25513f13e9a69dcf2925BDfcED50C13709554358", "0x25513f13e9a69dcf2925BDfcED50C13709554358", "0x25513f13e9a69dcf2925BDfcED50C13709554358"], 
-        1, ethAssetId, 8);
+  await deployer.deploy(Queue);
+  await deployer.link(Queue, Nebula);
+  await deployer.link(Queue, Gravity);
+
+  const gravity = await deployer.deploy(Gravity, accounts, 1);
+  const nebula = await deployer.deploy(Nebula, accounts.slice(0, 5), gravity.address, 3);
+  const token = await deployer.deploy(Token, "TEST", "TST", 8);
+
+  const ibport = await deployer.deploy(IBPort, nebula.address, token.address);
+
+  await token.addMinter(ibport.address);
+
+  // const sub = await nebula.subscribe(ibport.address, 0, "100000000000000")
+  const sub = await nebula.subscribe(ibport.address, 0, "0")
+  await web3.eth.sendTransaction({ from: accounts[0], to: sub.address, value:  "10000000000000000000" });
+  fs.writeFileSync("nebula.json", JSON.stringify({
+    address: nebula.address,
+    abi: JSON.stringify(nebula.abi),
+    tokenAbi: JSON.stringify(token.abi),
+    ibportAddress: ibport.address,
+    tokenAddress: token.address,
+    subscriptionId: sub.receipt.logs[0].args.id,
+  }));
 };

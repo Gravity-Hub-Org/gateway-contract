@@ -55,7 +55,7 @@ contract Nebula {
         emit NewPulse(block.number, dataHash);
     }
 
-    function sendData(bytes32[] memory value, uint256 blockNumber, bytes32 subscriptionId) public {
+    function sendData(bytes memory value, uint256 blockNumber, bytes32 subscriptionId) public {
         require(blockNumber <= block.number + 1, "invalid block number");
         require(isPublseSubSent[blockNumber][subscriptionId] == false, "sub sent");
         isPublseSubSent[blockNumber][subscriptionId] = true;
