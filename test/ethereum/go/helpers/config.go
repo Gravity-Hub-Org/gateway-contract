@@ -15,6 +15,7 @@ type NebulaData struct {
     Address string
     SubscriptionId string
     IbportAddress string
+    IbportAbi string
 	TokenAddress string
 	TokenAbi string
 }

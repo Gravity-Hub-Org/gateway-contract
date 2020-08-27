@@ -57,6 +57,7 @@ contract Nebula {
 
     function sendData(bytes memory value, uint256 blockNumber, bytes32 subscriptionId) public {
         require(blockNumber <= block.number + 1, "invalid block number");
+        require(keccak256(abi.encodePacked(value)) == pulses[blockNumber].dataHash, "hash mismatch");
         require(isPublseSubSent[blockNumber][subscriptionId] == false, "sub sent");
         isPublseSubSent[blockNumber][subscriptionId] = true;
 

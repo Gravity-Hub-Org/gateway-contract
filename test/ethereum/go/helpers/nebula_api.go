@@ -11,15 +11,54 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 type NebulaCaller struct {
 	contract *bind.BoundContract
-	Backend  bind.ContractBackend
+	Backend  *ethclient.Client
 	OraclePK []string
 }
 
-func NewNebula(address string, abiString string, backend bind.ContractBackend, OraclePK []string) NebulaCaller {
+type IBPortCaller struct {
+	contract *bind.BoundContract
+	Backend  *ethclient.Client
+	OraclePK []string
+}
+
+func NewIBPort(address string, abiString string, backend *ethclient.Client, OraclePK []string) IBPortCaller {
+	connectAddress := common.HexToAddress(address)
+	parsedAbi, _ := abi.JSON(strings.NewReader(abiString))
+	return IBPortCaller{
+		contract: bind.NewBoundContract(connectAddress, parsedAbi, backend, backend, backend),
+		Backend:  backend,
+		OraclePK: OraclePK,
+	}
+}
+
+func (caller *IBPortCaller) CreateTransferUnwrapRequest(amount *big.Int, address [32]byte) (*big.Int) {
+    privateKey, err := crypto.HexToECDSA(caller.OraclePK[0])
+	if err != nil {
+        log.Fatal(err)
+    }
+    auth := bind.NewKeyedTransactor(privateKey)
+    tx, err := caller.contract.Transact(auth, "createTransferUnwrapRequest", amount, address)
+    if err != nil {
+		log.Fatal(err)
+        return nil
+	}
+	receipt, err := caller.Backend.TransactionReceipt(context.Background(), tx.Hash())
+	if err != nil {
+		return nil
+	}
+	data := receipt.Logs[2].Data
+	var height *big.Int = big.NewInt(0)
+	height.SetBytes(data[0:32])
+
+    return height
+}
+
+func NewNebula(address string, abiString string, backend *ethclient.Client, OraclePK []string) NebulaCaller {
 	connectAddress := common.HexToAddress(address)
 	parsedAbi, _ := abi.JSON(strings.NewReader(abiString))
 	return NebulaCaller{
@@ -43,13 +82,12 @@ func (caller *NebulaCaller) SendData(value []byte, blockNumber *big.Int, subscri
     auth := bind.NewKeyedTransactor(privateKey)
     _, err = caller.contract.Transact(auth, "sendData", value, blockNumber, subscriptionId)
     if err != nil {
-		log.Fatal(err)
         return false
-    }
+	}
     return true
 }
 
-func (caller *NebulaCaller) SignData(dataHash [32]byte, validSignsCount int) bool {
+func (caller *NebulaCaller) SignData(dataHash [32]byte, validSignsCount int) (*big.Int) {
 	var r [5][32]byte
 	var s [5][32]byte
 	var v [5]uint8
@@ -96,10 +134,24 @@ func (caller *NebulaCaller) SignData(dataHash [32]byte, validSignsCount int) boo
 		}
 	}
 
-	_, err = caller.contract.Transact(auth, "confirmData", dataHash, v[:], r[:], s[:])
+	tx, err := caller.contract.Transact(auth, "confirmData", dataHash, v[:], r[:], s[:])
 	if err != nil {
-		return false
+		return nil
 	}
 
-	return true
+	receipt, err := caller.Backend.TransactionReceipt(context.Background(), tx.Hash())
+	if err != nil {
+		return nil
+	}
+	if len(receipt.Logs) == 0 {
+		return nil
+	}
+	data := receipt.Logs[0].Data
+	var height *big.Int = big.NewInt(0)
+	if len(data) >= 32 {
+		height.SetBytes(data[0:32])
+		return height
+	} else {
+		return nil
+	}
 }

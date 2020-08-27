@@ -18,13 +18,17 @@ module.exports = async function(deployer, network, accounts) {
 
   await token.addMinter(ibport.address);
 
-  // const sub = await nebula.subscribe(ibport.address, 0, "100000000000000")
-  const sub = await nebula.subscribe(ibport.address, 0, "0")
+  await token.mint(accounts[0], "100000000000000");
+  await token.approve(ibport.address, "100000000000000");
+
+  // const sub = await nebula.subscribe(ibport.address, 1, "100000000000000")
+  const sub = await nebula.subscribe(ibport.address, 1, "0")
   await web3.eth.sendTransaction({ from: accounts[0], to: sub.address, value:  "10000000000000000000" });
   fs.writeFileSync("nebula.json", JSON.stringify({
     address: nebula.address,
     abi: JSON.stringify(nebula.abi),
     tokenAbi: JSON.stringify(token.abi),
+    ibportAbi: JSON.stringify(ibport.abi),
     ibportAddress: ibport.address,
     tokenAddress: token.address,
     subscriptionId: sub.receipt.logs[0].args.id,
