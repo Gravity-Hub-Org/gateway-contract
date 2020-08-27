@@ -12,21 +12,37 @@ contract IBPort is ISubscription {
         Returned
     }
 
+    struct UnwrapRequest {
+        address receiver;
+        uint amount;
+    }
+
     address public nebula;
     Token public tokenAddress;
-    mapping(bytes32 => Status) public swapStatus;
+
+    uint public requestPosition = 0;
+    mapping(uint => UnwrapRequest) public unwrapRequests;
+    mapping(uint => Status) public swapStatus;
 
     constructor(address _nebula, address _tokenAddress) public {
         nebula = _nebula;
         tokenAddress = Token(_tokenAddress);
     }
 
-    function data2address(bytes32 d) internal pure returns (address payable) {
-        return address(uint160(uint(d)));
+    function deserializeUint(bytes memory b, uint startPos, uint len) internal pure returns (uint) {
+        uint v = 0;
+        for (uint p = startPos; p < startPos + len; p++) {
+            v = v * 256 + uint(uint8(b[p]));
+        }
+        return v;
     }
 
-    function data2status(bytes32 dd) internal pure returns (Status) {
-        uint d = uint(dd);
+    function deserializeAddress(bytes memory b, uint startPos) internal pure returns (address) {
+        return address(uint160(deserializeUint(b, startPos, 20)));
+    }
+
+    function deserializeStatus(bytes memory b, uint pos) internal pure returns (Status) {
+        uint d = uint(uint8(b[pos]));
         if (d == 0) return Status.None;
         if (d == 1) return Status.New;
         if (d == 2) return Status.Rejected;
@@ -35,22 +51,22 @@ contract IBPort is ISubscription {
         revert("invalid status");
     }
 
-    function attachData(bytes32[] calldata data) external {
+    function attachData(bytes calldata data) external {
         require(msg.sender == nebula, "access denied");
         for (uint pos = 0; pos < data.length; ) {
             bytes32 action = data[pos]; pos++;
 
             if (action == bytes32("mint")) {
-                bytes32 swapId = data[pos]; pos++;
-                uint amount = uint(data[pos]); pos++;
-                address receiver = data2address(data[pos]); pos++;
+                uint swapId = deserializeUint(data, pos, 32); pos += 32;
+                uint amount = deserializeUint(data, pos, 32); pos += 32;
+                address receiver = deserializeAddress(data, pos); pos += 20;
                 mint(swapId, amount, receiver);
                 continue;
             }
 
             if (action == bytes32("changeStatus")) {
-                bytes32 swapId = data[pos]; pos++;
-                Status newStatus = data2status(data[pos]); pos++;
+                uint swapId = deserializeUint(data, pos, 32); pos += 32;
+                Status newStatus = deserializeStatus(data, pos); pos += 1;
                 changeStatus(swapId, newStatus);
                 continue;
             }
@@ -58,18 +74,22 @@ contract IBPort is ISubscription {
         }
     }
 
-    function mint(bytes32 swapId, uint amount, address receiver) internal {
+    function mint(uint swapId, uint amount, address receiver) internal {
         require(swapStatus[swapId] == Status.New, "invalid request status");
         require(Token(tokenAddress).mint(receiver, amount), "invalid mint");
         swapStatus[swapId] = Status.Success;
     }
 
-    function changeStatus(bytes32 swapId, Status newStatus) internal {
+    function changeStatus(uint swapId, Status newStatus) internal {
         require(swapStatus[swapId] == Status.New, "invalid request status");
         swapStatus[swapId] = newStatus;
     }
 
-    // function createTransferUnwrapRequest() public {
-    // }
+    function createTransferUnwrapRequest(uint amount, address receiver) public returns (uint) {
+        unwrapRequests[requestPosition] = UnwrapRequest(receiver, amount);
+        swapStatus[requestPosition] = Status.New;
+        tokenAddress.burnFrom(msg.sender, amount);
+        return requestPosition++;
+    }
 }
 

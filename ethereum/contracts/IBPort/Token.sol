@@ -1,9 +1,10 @@
 pragma solidity >=0.5.16 <=0.6.6;
 
-import "../@openzeppelin/contracts/token/ERC20/ERC20.sol";
+// import "../@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import "../@openzeppelin/contracts/access/roles/MinterRole.sol";
 
-contract Token is ERC20, MinterRole {
+contract Token is ERC20Burnable, MinterRole {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
