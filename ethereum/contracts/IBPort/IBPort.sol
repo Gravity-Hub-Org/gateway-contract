@@ -54,9 +54,9 @@ contract IBPort is ISubscription {
     function attachData(bytes calldata data) external {
         require(msg.sender == nebula, "access denied");
         for (uint pos = 0; pos < data.length; ) {
-            bytes32 action = data[pos]; pos++;
+            bytes1 action = data[pos]; pos++;
 
-            if (action == bytes32("mint")) {
+            if (action == bytes1("m")) {
                 uint swapId = deserializeUint(data, pos, 32); pos += 32;
                 uint amount = deserializeUint(data, pos, 32); pos += 32;
                 address receiver = deserializeAddress(data, pos); pos += 20;
@@ -64,7 +64,7 @@ contract IBPort is ISubscription {
                 continue;
             }
 
-            if (action == bytes32("changeStatus")) {
+            if (action == bytes1("c")) {
                 uint swapId = deserializeUint(data, pos, 32); pos += 32;
                 Status newStatus = deserializeStatus(data, pos); pos += 1;
                 changeStatus(swapId, newStatus);
@@ -75,7 +75,7 @@ contract IBPort is ISubscription {
     }
 
     function mint(uint swapId, uint amount, address receiver) internal {
-        require(swapStatus[swapId] == Status.New, "invalid request status");
+        require(swapStatus[swapId] == Status.None, "invalid request status");
         require(Token(tokenAddress).mint(receiver, amount), "invalid mint");
         swapStatus[swapId] = Status.Success;
     }
