@@ -1,0 +1,13 @@
+version: '2.0'
+
+services: 
+    ganache:
+        build: docker/ganache
+        
+    golang:
+        image: golang
+        links: 
+            - ganache
+        volumes: 
+            - ./:/go/src/rh_tests:rw
+        command: sh -c "cd /go/src/rh_tests; go run rh_tests; go test"
