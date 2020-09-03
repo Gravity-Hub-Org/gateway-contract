@@ -49,6 +49,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		log.Fatal("error casting public key to ECDSA")
+	}
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
 	transactor := bind.NewKeyedTransactor(privateKey)
 	erc20addr, tx, token, err := contracts.DeployToken(transactor, ethConnection, "TST", "TST", 8)
 
@@ -77,11 +85,29 @@ func main() {
 	bind.WaitMined(context.Background(), ethConnection, tx)
 	addresses.IBPort = common.Bytes2Hex(ibportAddress.Bytes())
 
-	token.AddMinter(transactor, ibportAddress)
-	// token mint
-	// token approve
+	tx, err = token.AddMinter(transactor, ibportAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+
+	tx, err = token.Mint(transactor, fromAddress, big.NewInt(100000000000))
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+
+	tx, err = token.Approve(transactor, ibportAddress, big.NewInt(100000000000))
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
 
 	tx, err = nebula.Subscribe(transactor, ibportAddress, 1, big.NewInt(0))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	receipt, err := bind.WaitMined(context.Background(), ethConnection, tx)
 	if err != nil {
 		log.Fatal(err)

@@ -52,7 +52,7 @@ func BindContracts() {
     if err != nil {
         log.Fatal(err)
     }
-	ibportContract, err = contracts.NewIBPort(common.HexToAddress(addresses.Nebula), ethConnection)
+	ibportContract, err = contracts.NewIBPort(common.HexToAddress(addresses.IBPort), ethConnection)
     if err != nil {
         log.Fatal(err)
     }
@@ -151,7 +151,7 @@ func filladdress(data []byte, pos uint, addressStr string) {
 
 func bytes32fromhex(s string) ([32]byte) {
 	var ret [32]byte
-	decoded, err := hex.DecodeString(s[2:])
+	decoded, err := hex.DecodeString(s[:])
 	if err != nil {
 		return ret
 	}
@@ -257,9 +257,6 @@ func TestChangeStatusFail(t *testing.T) {
 }
 
 func TestChangeStatusOk(t *testing.T) {
-	var attachedData [1+32+1]byte
-	var address [32]byte
-
 	privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
 	if err != nil {
 		t.Error(err)
@@ -272,14 +269,21 @@ func TestChangeStatusOk(t *testing.T) {
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	copy(address[:], fromAddress[:])
 
 	auth := bind.NewKeyedTransactor(privateKey)
 
-	tx, err := ibportContract.CreateTransferUnwrapRequest(auth, big.NewInt(1), address)
+	tx, err := ibportContract.CreateTransferUnwrapRequest(auth, big.NewInt(10000000), fromAddress)
+    if err != nil {
+        log.Fatal(err)
+	}
+
 	receipt, err := bind.WaitMined(context.Background(), ethConnection, tx)
+
+	if len(receipt.Logs) < 3 {
+		log.Fatal("no log entry")
+	}
 	
-	requestCreatedEvent, err := ibportContract.IBPortFilterer.ParseRequestCreated(*receipt.Logs[0])
+	requestCreatedEvent, err := ibportContract.IBPortFilterer.ParseRequestCreated(*receipt.Logs[2])
     if err != nil {
         log.Fatal(err)
 	}
@@ -289,6 +293,7 @@ func TestChangeStatusOk(t *testing.T) {
 	if reqId == nil {
 		t.Error("request failed")
 	} else {
+		var attachedData [1+32+1]byte
 		attachedData[0] = 'c' // change status
 		filluint(attachedData[:], 1, 0)
 		attachedData[32] = reqId.Bytes()[0]
