@@ -17,14 +17,14 @@ type DeployedAddresses struct {
 
 func SaveAddresses(addresses DeployedAddresses) (string) {
 	file, _ := json.MarshalIndent(addresses, "", " ")
-	ioutil.WriteFile("addresses.json", file, 0644)
+	ioutil.WriteFile("./addresses.json", file, 0644)
 	return string(file)
 }
 
 func LoadAddresses() (DeployedAddresses, error) {
 	var config DeployedAddresses
 
-	configFile, err := os.Open("addresses.json")
+	configFile, err := os.Open("./addresses.json")
 	defer configFile.Close()
 
 	if err != nil {
@@ -43,7 +43,7 @@ func LoadAddresses() (DeployedAddresses, error) {
 func LoadConfiguration() (Config, error) {
 	var config Config
 
-	configFile, err := os.Open("config.json")
+	configFile, err := os.Open("./config.json")
 	defer configFile.Close()
 
 	if err != nil {
