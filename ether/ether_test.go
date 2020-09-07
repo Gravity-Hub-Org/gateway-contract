@@ -11,7 +11,8 @@ import (
     "crypto/ecdsa"
 	"math/rand"
 	"rh_tests/helpers"
-	"rh_tests/contracts"
+	"rh_tests/api/nebula"
+	"rh_tests/api/ibport"
 	"github.com/ethereum/go-ethereum/crypto"
     "github.com/ethereum/go-ethereum/accounts/abi/bind"
     "github.com/ethereum/go-ethereum/ethclient"
@@ -21,8 +22,8 @@ import (
 var ethConnection *ethclient.Client
 var config helpers.Config
 var addresses helpers.DeployedAddresses
-var nebulaContract *contracts.Nebula
-var ibportContract *contracts.IBPort
+var nebulaContract *nebula.Nebula
+var ibportContract *ibport.IBPort
 
 func ReadConfig() {
 	var err error
@@ -48,11 +49,11 @@ func ConnectClient() bool {
 
 func BindContracts() {
 	var err error
-	nebulaContract, err = contracts.NewNebula(common.HexToAddress(addresses.Nebula), ethConnection)
+	nebulaContract, err = nebula.NewNebula(common.HexToAddress(addresses.Nebula), ethConnection)
     if err != nil {
         log.Fatal(err)
     }
-	ibportContract, err = contracts.NewIBPort(common.HexToAddress(addresses.IBPort), ethConnection)
+	ibportContract, err = ibport.NewIBPort(common.HexToAddress(addresses.IBPort), ethConnection)
     if err != nil {
         log.Fatal(err)
     }

@@ -1,7 +1,8 @@
 package main
 
 import (
-	"rh_tests/contracts"
+	"rh_tests/api/nebula"
+	"rh_tests/api/ibport"
 	"rh_tests/helpers"
 	"crypto/ecdsa"
 	"context"
@@ -28,37 +29,8 @@ func pubFromPK(pk string) (common.Address) {
     return crypto.PubkeyToAddress(*publicKeyECDSA)
 }
 
-func main() {
-	var addresses helpers.DeployedAddresses
-
-	config, err := helpers.LoadConfiguration()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("using endpoint", config.Endpoint)
-
-	ctx := context.Background()
-	ethConnection, err := ethclient.DialContext(ctx, config.Endpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	publicKey := privateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Fatal("error casting public key to ECDSA")
-	}
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-
-	transactor := bind.NewKeyedTransactor(privateKey)
-	erc20addr, tx, token, err := contracts.DeployToken(transactor, ethConnection, "TST", "TST", 8)
+func deployIBPort(addresses *helpers.DeployedAddresses, fromAddress common.Address, ethConnection *ethclient.Client, transactor *bind.TransactOpts, config *helpers.Config) {
+	erc20addr, tx, token, err := ibport.DeployToken(transactor, ethConnection, "TST", "TST", 8)
 
 	if err != nil {
 		log.Fatal(err)
@@ -71,14 +43,14 @@ func main() {
 	for i := 0; i < 5; i++ {
 		oracles[i] = pubFromPK(config.OraclePK[i])
 	}
-	nebulaAddr, tx, nebula, err := contracts.DeployNebula(transactor, ethConnection, oracles[:], oracles[0], big.NewInt(3))
+	nebulaAddr, tx, nebula, err := nebula.DeployNebula(transactor, ethConnection, oracles[:], oracles[0], big.NewInt(3))
 	if err != nil {
 		log.Fatal(err)
 	}
 	bind.WaitMined(context.Background(), ethConnection, tx)
 	addresses.Nebula = common.Bytes2Hex(nebulaAddr.Bytes())
 
-	ibportAddress, tx, _, err := contracts.DeployIBPort(transactor, ethConnection, nebulaAddr, erc20addr)
+	ibportAddress, tx, _, err := ibport.DeployIBPort(transactor, ethConnection, nebulaAddr, erc20addr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -119,6 +91,44 @@ func main() {
 	}
 
 	addresses.SubscriptionId = common.Bytes2Hex(newSubEvent.Id[:])
+}
+
+func deployLUPort(addresses *helpers.DeployedAddresses, fromAddress common.Address, ethConnection *ethclient.Client, transactor *bind.TransactOpts, config *helpers.Config) {
+}
+
+func main() {
+	var addresses helpers.DeployedAddresses
+
+	config, err := helpers.LoadConfiguration()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("using endpoint", config.Endpoint)
+
+	ethConnection, err := ethclient.DialContext(context.Background(), config.Endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		log.Fatal("error casting public key to ECDSA")
+	}
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	transactor := bind.NewKeyedTransactor(privateKey)
+
+
+	deployIBPort(&addresses, fromAddress, ethConnection, transactor, &config)
+	deployLUPort(&addresses, fromAddress, ethConnection, transactor, &config)
 
 	log.Println(helpers.SaveAddresses(addresses))
 }
