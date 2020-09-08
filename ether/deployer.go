@@ -3,6 +3,7 @@ package main
 import (
 	"rh_tests/api/nebula"
 	"rh_tests/api/ibport"
+	"rh_tests/api/luport"
 	"rh_tests/helpers"
 	"crypto/ecdsa"
 	"context"
@@ -29,20 +30,25 @@ func pubFromPK(pk string) (common.Address) {
     return crypto.PubkeyToAddress(*publicKeyECDSA)
 }
 
+func oraclesFromPK(oraclePK [5]string) ([5]common.Address) {
+	var oracles [5]common.Address
+	for i := 0; i < 5; i++ {
+		oracles[i] = pubFromPK(oraclePK[i])
+	}
+	return oracles
+}
+
 func deployIBPort(addresses *helpers.DeployedAddresses, fromAddress common.Address, ethConnection *ethclient.Client, transactor *bind.TransactOpts, config *helpers.Config) {
-	erc20addr, tx, token, err := ibport.DeployToken(transactor, ethConnection, "TST", "TST", 8)
+	erc20MintableAddr, tx, tokenMintable, err := ibport.DeployToken(transactor, ethConnection, "TSTM", "TST mintable", 8)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	bind.WaitMined(context.Background(), ethConnection, tx)
 
-	addresses.ERC20 = common.Bytes2Hex(erc20addr.Bytes())
+	addresses.ERC20Mintable = common.Bytes2Hex(erc20MintableAddr.Bytes())
 
-	var oracles [5]common.Address
-	for i := 0; i < 5; i++ {
-		oracles[i] = pubFromPK(config.OraclePK[i])
-	}
+	oracles := oraclesFromPK(config.OraclePK)
 	nebulaAddr, tx, nebula, err := nebula.DeployNebula(transactor, ethConnection, oracles[:], oracles[0], big.NewInt(3))
 	if err != nil {
 		log.Fatal(err)
@@ -50,26 +56,26 @@ func deployIBPort(addresses *helpers.DeployedAddresses, fromAddress common.Addre
 	bind.WaitMined(context.Background(), ethConnection, tx)
 	addresses.Nebula = common.Bytes2Hex(nebulaAddr.Bytes())
 
-	ibportAddress, tx, _, err := ibport.DeployIBPort(transactor, ethConnection, nebulaAddr, erc20addr)
+	ibportAddress, tx, _, err := ibport.DeployIBPort(transactor, ethConnection, nebulaAddr, erc20MintableAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	bind.WaitMined(context.Background(), ethConnection, tx)
 	addresses.IBPort = common.Bytes2Hex(ibportAddress.Bytes())
 
-	tx, err = token.AddMinter(transactor, ibportAddress)
+	tx, err = tokenMintable.AddMinter(transactor, ibportAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 	bind.WaitMined(context.Background(), ethConnection, tx)
 
-	tx, err = token.Mint(transactor, fromAddress, big.NewInt(100000000000))
+	tx, err = tokenMintable.Mint(transactor, fromAddress, big.NewInt(100000000000))
 	if err != nil {
 		log.Fatal(err)
 	}
 	bind.WaitMined(context.Background(), ethConnection, tx)
 
-	tx, err = token.Approve(transactor, ibportAddress, big.NewInt(100000000000))
+	tx, err = tokenMintable.Approve(transactor, ibportAddress, big.NewInt(100000000000))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,6 +100,52 @@ func deployIBPort(addresses *helpers.DeployedAddresses, fromAddress common.Addre
 }
 
 func deployLUPort(addresses *helpers.DeployedAddresses, fromAddress common.Address, ethConnection *ethclient.Client, transactor *bind.TransactOpts, config *helpers.Config) {
+	erc20Addr, tx, token, err := luport.DeployToken(transactor, ethConnection, "TST", "TST", 8)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+
+	addresses.ERC20 = common.Bytes2Hex(erc20Addr.Bytes())
+
+	oracles := oraclesFromPK(config.OraclePK)
+	nebulaReverseAddr, tx, nebula, err := nebula.DeployNebula(transactor, ethConnection, oracles[:], oracles[0], big.NewInt(3))
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+	addresses.NebulaReverse = common.Bytes2Hex(nebulaReverseAddr.Bytes())
+
+	luportAddress, tx, _, err := luport.DeployLUPort(transactor, ethConnection, nebulaReverseAddr, erc20Addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+	addresses.LUPort = common.Bytes2Hex(luportAddress.Bytes())
+
+	tx, err = token.Approve(transactor, oracles[0], big.NewInt(100000000000))
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+
+	tx, err = nebula.Subscribe(transactor, luportAddress, 1, big.NewInt(0))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	receipt, err := bind.WaitMined(context.Background(), ethConnection, tx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	newSubEvent, err := nebula.NebulaFilterer.ParseNewSubscriber(*receipt.Logs[0])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	addresses.ReverseSubscriptionId = common.Bytes2Hex(newSubEvent.Id[:])
 }
 
 func main() {

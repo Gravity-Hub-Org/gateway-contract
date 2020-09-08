@@ -13,6 +13,7 @@ import (
 	"rh_tests/helpers"
 	"rh_tests/api/nebula"
 	"rh_tests/api/ibport"
+	"rh_tests/api/luport"
 	"github.com/ethereum/go-ethereum/crypto"
     "github.com/ethereum/go-ethereum/accounts/abi/bind"
     "github.com/ethereum/go-ethereum/ethclient"
@@ -24,6 +25,7 @@ var config helpers.Config
 var addresses helpers.DeployedAddresses
 var nebulaContract *nebula.Nebula
 var ibportContract *ibport.IBPort
+var luportContract *luport.LUPort
 
 func ReadConfig() {
 	var err error
@@ -54,6 +56,10 @@ func BindContracts() {
         log.Fatal(err)
     }
 	ibportContract, err = ibport.NewIBPort(common.HexToAddress(addresses.IBPort), ethConnection)
+    if err != nil {
+        log.Fatal(err)
+    }
+	luportContract, err = luport.NewLUPort(common.HexToAddress(addresses.IBPort), ethConnection)
     if err != nil {
         log.Fatal(err)
     }

@@ -12,7 +12,7 @@ type Config struct {
 }
 
 type DeployedAddresses struct {
-	Nebula, ERC20, IBPort, SubscriptionId string
+	Nebula, NebulaReverse, ERC20, ERC20Mintable, IBPort, LUPort, SubscriptionId, ReverseSubscriptionId string
 }
 
 func SaveAddresses(addresses DeployedAddresses) (string) {
