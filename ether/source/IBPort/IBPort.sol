@@ -13,11 +13,11 @@ contract IBPort is ISubscription {
     }
 
     struct UnwrapRequest {
-        address receiver;
+        bytes32 receiver;
         uint amount;
     }
 
-    event RequestCreated(uint, address, address, uint);
+    event RequestCreated(uint, address, bytes32, uint);
 
     address public nebula;
     Token public tokenAddress;
@@ -88,7 +88,7 @@ contract IBPort is ISubscription {
     }
 
 
-    function createTransferUnwrapRequest(uint amount, address receiver) public {
+    function createTransferUnwrapRequest(uint amount, bytes32 receiver) public {
         unwrapRequests[requestPosition] = UnwrapRequest(receiver, amount);
         swapStatus[requestPosition] = Status.New;
         tokenAddress.burnFrom(msg.sender, amount);

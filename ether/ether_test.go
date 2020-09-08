@@ -258,22 +258,16 @@ func TestChangeStatusFail(t *testing.T) {
 }
 
 func TestChangeStatusOk(t *testing.T) {
+	var dummyAddress [32]byte
+
 	privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
 	if err != nil {
 		t.Error(err)
 	}
 
-	publicKey := privateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		t.Error("error casting public key to ECDSA")
-	}
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-
 	auth := bind.NewKeyedTransactor(privateKey)
 
-	tx, err := ibportContract.CreateTransferUnwrapRequest(auth, big.NewInt(10000000), fromAddress)
+	tx, err := ibportContract.CreateTransferUnwrapRequest(auth, big.NewInt(10000000), dummyAddress)
     if err != nil {
         log.Fatal(err)
 	}

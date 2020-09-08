@@ -1542,12 +1542,12 @@ func (_ERC20Burnable *ERC20BurnableFilterer) ParseTransfer(log types.Log) (*ERC2
 }
 
 // IBPortABI is the input ABI used to generate the binding from.
-const IBPortABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nebula\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"RequestCreated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"attachData\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"}],\"name\":\"createTransferUnwrapRequest\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"nebula\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"requestPosition\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"swapStatus\",\"outputs\":[{\"internalType\":\"enumIBPort.Status\",\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenAddress\",\"outputs\":[{\"internalType\":\"contractToken\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"unwrapRequests\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const IBPortABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nebula\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"RequestCreated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"attachData\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"receiver\",\"type\":\"bytes32\"}],\"name\":\"createTransferUnwrapRequest\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"nebula\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"requestPosition\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"swapStatus\",\"outputs\":[{\"internalType\":\"enumIBPort.Status\",\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenAddress\",\"outputs\":[{\"internalType\":\"contractToken\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"unwrapRequests\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"receiver\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // IBPortFuncSigs maps the 4-byte function signature to its string representation.
 var IBPortFuncSigs = map[string]string{
 	"37ef679a": "attachData(bytes)",
-	"215a6eb3": "createTransferUnwrapRequest(uint256,address)",
+	"ab9a9916": "createTransferUnwrapRequest(uint256,bytes32)",
 	"4ecde849": "nebula()",
 	"1c7bbdf3": "requestPosition()",
 	"0872512b": "swapStatus(uint256)",
@@ -1556,7 +1556,7 @@ var IBPortFuncSigs = map[string]string{
 }
 
 // IBPortBin is the compiled bytecode used for deploying new contracts.
-var IBPortBin = "0x6080604052600160025534801561001557600080fd5b5060405161098e38038061098e8339818101604052604081101561003857600080fd5b508051602090910151600080546001600160a01b039384166001600160a01b0319918216179091556001805493909216921691909117905561090f8061007f6000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c806337ef679a1161005b57806337ef679a1461010b5780634ecde8491461017b5780639d76ea581461019f578063d99c2a72146101a75761007d565b80630872512b146100825780631c7bbdf3146100c3578063215a6eb3146100dd575b600080fd5b61009f6004803603602081101561009857600080fd5b50356101e7565b604051808260048111156100af57fe5b60ff16815260200191505060405180910390f35b6100cb6101fc565b60408051918252519081900360200190f35b610109600480360360408110156100f357600080fd5b50803590602001356001600160a01b0316610202565b005b6101096004803603602081101561012157600080fd5b81019060208101813564010000000081111561013c57600080fd5b82018360208201111561014e57600080fd5b8035906020019184600183028401116401000000008311171561017057600080fd5b509092509050610317565b6101836105a6565b604080516001600160a01b039092168252519081900360200190f35b6101836105b5565b6101c4600480360360208110156101bd57600080fd5b50356105c4565b604080516001600160a01b03909316835260208301919091528051918290030190f35b60046020526000908152604090205460ff1681565b60025481565b6040805180820182526001600160a01b038381168252602080830186815260028054600090815260038452868120955186546001600160a01b0319169086161786559151600195860155548152600491829052848120805460ff1916851790559254845163079cc67960e41b8152339281019290925260248201879052935193909116926379cc67909260448084019391929182900301818387803b1580156102aa57600080fd5b505af11580156102be573d6000803e3d6000fd5b5050600254604080519182523360208301526001600160a01b0385168282015260608201869052517f0e7a8745f486625fa0fdb624c86193bdeab0bf9cdbf7b7225faf71fdcb60998f9350908190036080019150a15050565b6000546001600160a01b03163314610366576040805162461bcd60e51b815260206004820152600d60248201526c1858d8d95cdcc819195b9a5959609a1b604482015290519081900360640190fd5b60005b818110156105a157600083838381811061037f57fe5b6001909401936001600160f81b031992013591909116915050606d60f81b81141561049f5760006103ea85858080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250879250602091506105e99050565b9050602083019250600061043886868080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250889250602091506105e99050565b9050602084019350600061048387878080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525089925061062a915050565b9050601485019450610496838383610641565b5050505061059c565b6001600160f81b03198116606360f81b14156105605760006104fb85858080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250879250602091506105e99050565b9050602083019250600061054686868080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250889250610789915050565b9050600184019350610558828261083b565b50505061059c565b6040805162461bcd60e51b815260206004820152600c60248201526b696e76616c6964206461746160a01b604482015290519081900360640190fd5b610369565b505050565b6000546001600160a01b031681565b6001546001600160a01b031681565b600360205260009081526040902080546001909101546001600160a01b039091169082565b600080835b8385018110156106215785818151811061060457fe5b60209101015160f81c6101009290920291909101906001016105ee565b50949350505050565b6000610638838360146105e9565b90505b92915050565b600083815260046020819052604082205460ff169081111561065f57fe5b146106aa576040805162461bcd60e51b8152602060048201526016602482015275696e76616c696420726571756573742073746174757360501b604482015290519081900360640190fd5b600154604080516340c10f1960e01b81526001600160a01b03848116600483015260248201869052915191909216916340c10f199160448083019260209291908290030181600087803b15801561070057600080fd5b505af1158015610714573d6000803e3d6000fd5b505050506040513d602081101561072a57600080fd5b505161076c576040805162461bcd60e51b815260206004820152600c60248201526b1a5b9d985b1a59081b5a5b9d60a21b604482015290519081900360640190fd5b50506000908152600460205260409020805460ff19166003179055565b60008083838151811061079857fe5b016020015160f81c9050806107b157600091505061063b565b80600114156107c457600191505061063b565b80600214156107d757600291505061063b565b80600314156107ea57600391505061063b565b80600414156107fd57600491505061063b565b6040805162461bcd60e51b815260206004820152600e60248201526d696e76616c69642073746174757360901b604482015290519081900360640190fd5b600160008381526004602081905260409091205460ff169081111561085c57fe5b146108a7576040805162461bcd60e51b8152602060048201526016602482015275696e76616c696420726571756573742073746174757360501b604482015290519081900360640190fd5b60008281526004602081905260409091208054839260ff199091169060019084908111156108d157fe5b0217905550505056fea265627a7a723158206f2c226e7b6a5374a35ba57959402740b637d70683fa23f3eda64d757cb2bad664736f6c63430005100032"
+var IBPortBin = "0x6080604052600160025534801561001557600080fd5b506040516109543803806109548339818101604052604081101561003857600080fd5b508051602090910151600080546001600160a01b039384166001600160a01b031991821617909155600180549390921692169190911790556108d58061007f6000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80634ecde8491161005b5780634ecde8491461014f5780639d76ea5814610173578063ab9a99161461017b578063d99c2a721461019e5761007d565b80630872512b146100825780631c7bbdf3146100c357806337ef679a146100dd575b600080fd5b61009f6004803603602081101561009857600080fd5b50356101d4565b604051808260048111156100af57fe5b60ff16815260200191505060405180910390f35b6100cb6101e9565b60408051918252519081900360200190f35b61014d600480360360208110156100f357600080fd5b81019060208101813564010000000081111561010e57600080fd5b82018360208201111561012057600080fd5b8035906020019184600183028401116401000000008311171561014257600080fd5b5090925090506101ef565b005b61015761047e565b604080516001600160a01b039092168252519081900360200190f35b61015761048d565b61014d6004803603604081101561019157600080fd5b508035906020013561049c565b6101bb600480360360208110156101b457600080fd5b5035610596565b6040805192835260208301919091528051918290030190f35b60046020526000908152604090205460ff1681565b60025481565b6000546001600160a01b0316331461023e576040805162461bcd60e51b815260206004820152600d60248201526c1858d8d95cdcc819195b9a5959609a1b604482015290519081900360640190fd5b60005b8181101561047957600083838381811061025757fe5b6001909401936001600160f81b031992013591909116915050606d60f81b8114156103775760006102c285858080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250879250602091506105af9050565b9050602083019250600061031086868080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250889250602091506105af9050565b9050602084019350600061035b87878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508992506105f0915050565b905060148501945061036e838383610607565b50505050610474565b6001600160f81b03198116606360f81b14156104385760006103d385858080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250879250602091506105af9050565b9050602083019250600061041e86868080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525088925061074f915050565b90506001840193506104308282610801565b505050610474565b6040805162461bcd60e51b815260206004820152600c60248201526b696e76616c6964206461746160a01b604482015290519081900360640190fd5b610241565b505050565b6000546001600160a01b031681565b6001546001600160a01b031681565b604080518082018252828152602080820185815260028054600090815260038452858120945185559151600194850155548152600491829052838120805460ff1916841790559154835163079cc67960e41b815233928101929092526024820186905292516001600160a01b03909316926379cc67909260448084019391929182900301818387803b15801561053157600080fd5b505af1158015610545573d6000803e3d6000fd5b50506002546040805191825233602083015281810185905260608201869052517f78e1c38f7bce169c7cf026c9115bab62243678331df819e47ba8f2cd48ba259b9350908190036080019150a15050565b6003602052600090815260409020805460019091015482565b600080835b8385018110156105e7578581815181106105ca57fe5b60209101015160f81c6101009290920291909101906001016105b4565b50949350505050565b60006105fe838360146105af565b90505b92915050565b600083815260046020819052604082205460ff169081111561062557fe5b14610670576040805162461bcd60e51b8152602060048201526016602482015275696e76616c696420726571756573742073746174757360501b604482015290519081900360640190fd5b600154604080516340c10f1960e01b81526001600160a01b03848116600483015260248201869052915191909216916340c10f199160448083019260209291908290030181600087803b1580156106c657600080fd5b505af11580156106da573d6000803e3d6000fd5b505050506040513d60208110156106f057600080fd5b5051610732576040805162461bcd60e51b815260206004820152600c60248201526b1a5b9d985b1a59081b5a5b9d60a21b604482015290519081900360640190fd5b50506000908152600460205260409020805460ff19166003179055565b60008083838151811061075e57fe5b016020015160f81c905080610777576000915050610601565b806001141561078a576001915050610601565b806002141561079d576002915050610601565b80600314156107b0576003915050610601565b80600414156107c3576004915050610601565b6040805162461bcd60e51b815260206004820152600e60248201526d696e76616c69642073746174757360901b604482015290519081900360640190fd5b600160008381526004602081905260409091205460ff169081111561082257fe5b1461086d576040805162461bcd60e51b8152602060048201526016602482015275696e76616c696420726571756573742073746174757360501b604482015290519081900360640190fd5b60008281526004602081905260409091208054839260ff1990911690600190849081111561089757fe5b0217905550505056fea265627a7a72315820aaa71d49913358fae69da1d9100b6b6b961bbcd3286e8c31887b13cf658cd74864736f6c63430005100032"
 
 // DeployIBPort deploys a new Ethereum contract, binding an instance of IBPort to it.
 func DeployIBPort(auth *bind.TransactOpts, backend bind.ContractBackend, _nebula common.Address, _tokenAddress common.Address) (common.Address, *types.Transaction, *IBPort, error) {
@@ -1820,13 +1820,13 @@ func (_IBPort *IBPortCallerSession) TokenAddress() (common.Address, error) {
 
 // UnwrapRequests is a free data retrieval call binding the contract method 0xd99c2a72.
 //
-// Solidity: function unwrapRequests(uint256 ) view returns(address receiver, uint256 amount)
+// Solidity: function unwrapRequests(uint256 ) view returns(bytes32 receiver, uint256 amount)
 func (_IBPort *IBPortCaller) UnwrapRequests(opts *bind.CallOpts, arg0 *big.Int) (struct {
-	Receiver common.Address
+	Receiver [32]byte
 	Amount   *big.Int
 }, error) {
 	ret := new(struct {
-		Receiver common.Address
+		Receiver [32]byte
 		Amount   *big.Int
 	})
 	out := ret
@@ -1836,9 +1836,9 @@ func (_IBPort *IBPortCaller) UnwrapRequests(opts *bind.CallOpts, arg0 *big.Int) 
 
 // UnwrapRequests is a free data retrieval call binding the contract method 0xd99c2a72.
 //
-// Solidity: function unwrapRequests(uint256 ) view returns(address receiver, uint256 amount)
+// Solidity: function unwrapRequests(uint256 ) view returns(bytes32 receiver, uint256 amount)
 func (_IBPort *IBPortSession) UnwrapRequests(arg0 *big.Int) (struct {
-	Receiver common.Address
+	Receiver [32]byte
 	Amount   *big.Int
 }, error) {
 	return _IBPort.Contract.UnwrapRequests(&_IBPort.CallOpts, arg0)
@@ -1846,9 +1846,9 @@ func (_IBPort *IBPortSession) UnwrapRequests(arg0 *big.Int) (struct {
 
 // UnwrapRequests is a free data retrieval call binding the contract method 0xd99c2a72.
 //
-// Solidity: function unwrapRequests(uint256 ) view returns(address receiver, uint256 amount)
+// Solidity: function unwrapRequests(uint256 ) view returns(bytes32 receiver, uint256 amount)
 func (_IBPort *IBPortCallerSession) UnwrapRequests(arg0 *big.Int) (struct {
-	Receiver common.Address
+	Receiver [32]byte
 	Amount   *big.Int
 }, error) {
 	return _IBPort.Contract.UnwrapRequests(&_IBPort.CallOpts, arg0)
@@ -1875,24 +1875,24 @@ func (_IBPort *IBPortTransactorSession) AttachData(data []byte) (*types.Transact
 	return _IBPort.Contract.AttachData(&_IBPort.TransactOpts, data)
 }
 
-// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0x215a6eb3.
+// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0xab9a9916.
 //
-// Solidity: function createTransferUnwrapRequest(uint256 amount, address receiver) returns()
-func (_IBPort *IBPortTransactor) CreateTransferUnwrapRequest(opts *bind.TransactOpts, amount *big.Int, receiver common.Address) (*types.Transaction, error) {
+// Solidity: function createTransferUnwrapRequest(uint256 amount, bytes32 receiver) returns()
+func (_IBPort *IBPortTransactor) CreateTransferUnwrapRequest(opts *bind.TransactOpts, amount *big.Int, receiver [32]byte) (*types.Transaction, error) {
 	return _IBPort.contract.Transact(opts, "createTransferUnwrapRequest", amount, receiver)
 }
 
-// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0x215a6eb3.
+// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0xab9a9916.
 //
-// Solidity: function createTransferUnwrapRequest(uint256 amount, address receiver) returns()
-func (_IBPort *IBPortSession) CreateTransferUnwrapRequest(amount *big.Int, receiver common.Address) (*types.Transaction, error) {
+// Solidity: function createTransferUnwrapRequest(uint256 amount, bytes32 receiver) returns()
+func (_IBPort *IBPortSession) CreateTransferUnwrapRequest(amount *big.Int, receiver [32]byte) (*types.Transaction, error) {
 	return _IBPort.Contract.CreateTransferUnwrapRequest(&_IBPort.TransactOpts, amount, receiver)
 }
 
-// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0x215a6eb3.
+// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0xab9a9916.
 //
-// Solidity: function createTransferUnwrapRequest(uint256 amount, address receiver) returns()
-func (_IBPort *IBPortTransactorSession) CreateTransferUnwrapRequest(amount *big.Int, receiver common.Address) (*types.Transaction, error) {
+// Solidity: function createTransferUnwrapRequest(uint256 amount, bytes32 receiver) returns()
+func (_IBPort *IBPortTransactorSession) CreateTransferUnwrapRequest(amount *big.Int, receiver [32]byte) (*types.Transaction, error) {
 	return _IBPort.Contract.CreateTransferUnwrapRequest(&_IBPort.TransactOpts, amount, receiver)
 }
 
@@ -1967,14 +1967,14 @@ func (it *IBPortRequestCreatedIterator) Close() error {
 type IBPortRequestCreated struct {
 	Arg0 *big.Int
 	Arg1 common.Address
-	Arg2 common.Address
+	Arg2 [32]byte
 	Arg3 *big.Int
 	Raw  types.Log // Blockchain specific contextual infos
 }
 
-// FilterRequestCreated is a free log retrieval operation binding the contract event 0x0e7a8745f486625fa0fdb624c86193bdeab0bf9cdbf7b7225faf71fdcb60998f.
+// FilterRequestCreated is a free log retrieval operation binding the contract event 0x78e1c38f7bce169c7cf026c9115bab62243678331df819e47ba8f2cd48ba259b.
 //
-// Solidity: event RequestCreated(uint256 arg0, address arg1, address arg2, uint256 arg3)
+// Solidity: event RequestCreated(uint256 arg0, address arg1, bytes32 arg2, uint256 arg3)
 func (_IBPort *IBPortFilterer) FilterRequestCreated(opts *bind.FilterOpts) (*IBPortRequestCreatedIterator, error) {
 
 	logs, sub, err := _IBPort.contract.FilterLogs(opts, "RequestCreated")
@@ -1984,9 +1984,9 @@ func (_IBPort *IBPortFilterer) FilterRequestCreated(opts *bind.FilterOpts) (*IBP
 	return &IBPortRequestCreatedIterator{contract: _IBPort.contract, event: "RequestCreated", logs: logs, sub: sub}, nil
 }
 
-// WatchRequestCreated is a free log subscription operation binding the contract event 0x0e7a8745f486625fa0fdb624c86193bdeab0bf9cdbf7b7225faf71fdcb60998f.
+// WatchRequestCreated is a free log subscription operation binding the contract event 0x78e1c38f7bce169c7cf026c9115bab62243678331df819e47ba8f2cd48ba259b.
 //
-// Solidity: event RequestCreated(uint256 arg0, address arg1, address arg2, uint256 arg3)
+// Solidity: event RequestCreated(uint256 arg0, address arg1, bytes32 arg2, uint256 arg3)
 func (_IBPort *IBPortFilterer) WatchRequestCreated(opts *bind.WatchOpts, sink chan<- *IBPortRequestCreated) (event.Subscription, error) {
 
 	logs, sub, err := _IBPort.contract.WatchLogs(opts, "RequestCreated")
@@ -2021,9 +2021,9 @@ func (_IBPort *IBPortFilterer) WatchRequestCreated(opts *bind.WatchOpts, sink ch
 	}), nil
 }
 
-// ParseRequestCreated is a log parse operation binding the contract event 0x0e7a8745f486625fa0fdb624c86193bdeab0bf9cdbf7b7225faf71fdcb60998f.
+// ParseRequestCreated is a log parse operation binding the contract event 0x78e1c38f7bce169c7cf026c9115bab62243678331df819e47ba8f2cd48ba259b.
 //
-// Solidity: event RequestCreated(uint256 arg0, address arg1, address arg2, uint256 arg3)
+// Solidity: event RequestCreated(uint256 arg0, address arg1, bytes32 arg2, uint256 arg3)
 func (_IBPort *IBPortFilterer) ParseRequestCreated(log types.Log) (*IBPortRequestCreated, error) {
 	event := new(IBPortRequestCreated)
 	if err := _IBPort.contract.UnpackLog(event, "RequestCreated", log); err != nil {
