@@ -1,9 +1,9 @@
-pragma solidity >=0.5.16 <=0.6.6;
+pragma solidity ^0.7;
 
-import "./Token.sol";
-import "../interfaces/ISubscription.sol";
+import "../Token/Token.sol";
+import "../interfaces/ISubscriberBytes.sol";
 
-contract IBPort is ISubscription {
+contract IBPort is ISubscriberBytes {
     enum Status {
         None,
         New,
@@ -26,7 +26,7 @@ contract IBPort is ISubscription {
     mapping(uint => UnwrapRequest) public unwrapRequests;
     mapping(uint => Status) public swapStatus;
 
-    constructor(address _nebula, address _tokenAddress) public {
+    constructor(address _nebula, address _tokenAddress) {
         nebula = _nebula;
         tokenAddress = Token(_tokenAddress);
     }
@@ -53,22 +53,22 @@ contract IBPort is ISubscription {
         revert("invalid status");
     }
 
-    function attachData(bytes calldata data) external {
+    function attachValue(bytes calldata value) override external {
         require(msg.sender == nebula, "access denied");
-        for (uint pos = 0; pos < data.length; ) {
-            bytes1 action = data[pos]; pos++;
+        for (uint pos = 0; pos < value.length; ) {
+            bytes1 action = value[pos]; pos++;
 
             if (action == bytes1("m")) {
-                uint swapId = deserializeUint(data, pos, 32); pos += 32;
-                uint amount = deserializeUint(data, pos, 32); pos += 32;
-                address receiver = deserializeAddress(data, pos); pos += 20;
+                uint swapId = deserializeUint(value, pos, 32); pos += 32;
+                uint amount = deserializeUint(value, pos, 32); pos += 32;
+                address receiver = deserializeAddress(value, pos); pos += 20;
                 mint(swapId, amount, receiver);
                 continue;
             }
 
             if (action == bytes1("c")) {
-                uint swapId = deserializeUint(data, pos, 32); pos += 32;
-                Status newStatus = deserializeStatus(data, pos); pos += 1;
+                uint swapId = deserializeUint(value, pos, 32); pos += 32;
+                Status newStatus = deserializeStatus(value, pos); pos += 1;
                 changeStatus(swapId, newStatus);
                 continue;
             }
@@ -78,7 +78,7 @@ contract IBPort is ISubscription {
 
     function mint(uint swapId, uint amount, address receiver) internal {
         require(swapStatus[swapId] == Status.None, "invalid request status");
-        require(Token(tokenAddress).mint(receiver, amount), "invalid mint");
+        Token(tokenAddress).mint(receiver, amount);
         swapStatus[swapId] = Status.Success;
     }
 

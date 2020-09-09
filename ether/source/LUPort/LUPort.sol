@@ -1,19 +1,20 @@
-pragma solidity >=0.5.16 <=0.6.6;
+pragma solidity ^0.7;
 
-import "./Token.sol";
-import "../interfaces/ISubscription.sol";
+import "../Token/Token.sol";
+import "../interfaces/ISubscriberBytes.sol";
 
-contract LUPort is ISubscription {
+contract LUPort is ISubscriberBytes {
     address public nebula;
     Token public tokenAddress;
 
-    constructor(address _nebula, address _tokenAddress) public {
+    constructor(address _nebula, address _tokenAddress) {
         nebula = _nebula;
         tokenAddress = Token(_tokenAddress);
     }
 
-    function attachData(bytes calldata data) external {
+    function attachValue(bytes calldata value) external override {
     }
+
     function createTransferUnwrapRequest(uint amount, address receiver) public {
     }
 }

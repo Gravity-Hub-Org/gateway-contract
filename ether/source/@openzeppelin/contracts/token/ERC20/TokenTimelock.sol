@@ -1,4 +1,6 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.7.0;
 
 import "./SafeERC20.sol";
 
@@ -8,8 +10,6 @@ import "./SafeERC20.sol";
  *
  * Useful for simple vesting schedules like "advisors get all of their tokens
  * after 1 year".
- *
- * For a more complete vesting schedule, see {TokenVesting}.
  */
 contract TokenTimelock {
     using SafeERC20 for IERC20;
@@ -23,7 +23,7 @@ contract TokenTimelock {
     // timestamp when token release is enabled
     uint256 private _releaseTime;
 
-    constructor (IERC20 token, address beneficiary, uint256 releaseTime) public {
+    constructor (IERC20 token, address beneficiary, uint256 releaseTime) {
         // solhint-disable-next-line not-rely-on-time
         require(releaseTime > block.timestamp, "TokenTimelock: release time is before current time");
         _token = token;
@@ -55,7 +55,7 @@ contract TokenTimelock {
     /**
      * @notice Transfers tokens held by timelock to beneficiary.
      */
-    function release() public {
+    function release() public virtual {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= _releaseTime, "TokenTimelock: current time is before release time");
 

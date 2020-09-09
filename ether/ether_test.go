@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	// "bytes"
 	"encoding/hex"
     "os"
     "log"
@@ -112,7 +111,7 @@ func signData(dataHash [32]byte, validSignsCount int) (*big.Int) {
         }
     }
 
-    tx, err := nebulaContract.ConfirmData(auth, dataHash, v[:], r[:], s[:])
+    tx, err := nebulaContract.SendHashValue(auth, dataHash, v[:], r[:], s[:])
     if err != nil {
         return nil
 	}
@@ -127,7 +126,7 @@ func signData(dataHash [32]byte, validSignsCount int) (*big.Int) {
         log.Fatal(err)
 	}
 
-	return pulseEvent.Height
+	return pulseEvent.PulseId
 }
 
 func TestMain(m *testing.M) {
@@ -172,7 +171,7 @@ func sendData(key string, value []byte, blockNumber *big.Int, subscriptionId [32
         log.Fatal(err)
     }
     auth := bind.NewKeyedTransactor(privateKey)
-    _, err = nebulaContract.SendData(auth, value, blockNumber, subscriptionId)
+    _, err = nebulaContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
     if err != nil {
         return false
 	}
@@ -182,17 +181,17 @@ func sendData(key string, value []byte, blockNumber *big.Int, subscriptionId [32
 
 func TestPulseSaved(t *testing.T) {
 	d := Random32Byte()
-	height := signData(d, 5)
-	if height == nil {
+	pulseId := signData(d, 5)
+	if pulseId == nil {
 		t.Error("can't send signed data")
 	} else {
-		pulseData, err := nebulaContract.Pulses(nil, height)
+		pulseData, err := nebulaContract.Pulses(nil, pulseId)
 
 		if err != nil {
 			t.Error("can't get pulse hash")
 		}
 
-		if d != pulseData {
+		if d != pulseData.DataHash {
 			t.Error("data mismatch")
 		}
 	}
@@ -220,10 +219,10 @@ func TestInvalidHash(t *testing.T) {
 	// generate invalid proof
 	proof := crypto.Keccak256Hash(attachedData[:])
 
-	height := signData(proof, 5)
-	if height == nil {
+	pulseId := signData(proof, 5)
+	if pulseId == nil {
 		t.Error("can't submit proof")
-	} else if sendData(config.OraclePK[0], attachedData[:], height, bytes32fromhex(addresses.SubscriptionId)) {
+	} else if sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
 		t.Error("this tx should fail because of invalid hash")
 	}
 }
@@ -237,10 +236,10 @@ func TestMint(t *testing.T) {
 	filladdress(attachedData[:], 1+32+32, "9561C133DD8580860B6b7E504bC5Aa500f0f0103") // address
 
 	proof := crypto.Keccak256Hash(attachedData[:])
-	height := signData(proof, 5)
-	if height == nil {
+	pulseId := signData(proof, 5)
+	if pulseId == nil {
 		t.Error("can't submit proof")
-	} else if !sendData(config.OraclePK[0], attachedData[:], height, bytes32fromhex(addresses.SubscriptionId)) {
+	} else if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
 		t.Error("can't submit data")
 	}
 }
@@ -253,12 +252,12 @@ func TestChangeStatusFail(t *testing.T) {
 	attachedData[1+32] = 1
 
 	proof := crypto.Keccak256Hash(attachedData[:])
-	height := signData(proof, 5)
-	if height == nil {
+	pulseId := signData(proof, 5)
+	if pulseId == nil {
 		t.Error("can't submit proof")
 	}
 
-	if sendData(config.OraclePK[0], attachedData[:], height, bytes32fromhex(addresses.SubscriptionId)) {
+	if sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
 		t.Error("request should fail")
 	}
 }
@@ -302,13 +301,13 @@ func TestChangeStatusOk(t *testing.T) {
 		attachedData[1+32] = 2 // next status
 
 		proof := crypto.Keccak256Hash(attachedData[:])
-		height := signData(proof, 5)
-		if height == nil {
+		pulseId := signData(proof, 5)
+		if pulseId == nil {
 			t.Error("can't submit proof")
 		}
 
-		if !sendData(config.OraclePK[0], attachedData[:], height, bytes32fromhex(addresses.SubscriptionId)) {
-			t.Error("request failed")
+		if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
+			t.Error("request failed", pulseId)
 		}
 	}
 }

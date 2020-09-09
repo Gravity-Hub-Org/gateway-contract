@@ -1,7 +1,13 @@
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity ^0.7.0;
 
 library NModels {
     uint8 constant oracleCountInEpoch = 5;
+
+    enum DataType {
+        Int64,
+        String,
+        Bytes
+    }
 
     struct Subscription {
         address owner;
@@ -12,6 +18,7 @@ library NModels {
 
     struct Pulse {
         bytes32 dataHash;
+        uint256 height;
     }
 
     struct Oracle {

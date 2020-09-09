@@ -1,12 +1,14 @@
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity ^0.7.0;
 
 import "../Gravity/Gravity.sol";
 import "../libs/Queue.sol";
 import "./NModels.sol";
-import "../interfaces/ISubscription.sol";
+import "../interfaces/ISubscriberBytes.sol";
+import "../interfaces/ISubscriberInt.sol";
+import "../interfaces/ISubscriberString.sol";
 
 contract Nebula {
-    event NewPulse(uint256 height, bytes32 dataHash);
+    event NewPulse(uint256 pulseId, uint256 height, bytes32 dataHash);
     event NewSubscriber(bytes32 id);
 
     mapping(uint256=>bool) public rounds;
@@ -17,31 +19,46 @@ contract Nebula {
 
     address[] public oracles;
     uint256 public bftValue;
-    address gravityContract;
+    address public gravityContract;
+    NModels.DataType public dataType;
 
     bytes32[] public subscriptionIds;
+    uint256 public lastPulseId;
     mapping(bytes32 => NModels.Subscription) public subscriptions;
     mapping(uint256 => NModels.Pulse) public pulses;
     mapping(uint256 => mapping(bytes32 => bool)) public isPublseSubSent;
 
-    constructor(address[] memory newOracle, address newGravityContract, uint256 newBftValue) public {
+    constructor(NModels.DataType newDataType, address newGravityContract, address[] memory newOracle, uint256 newBftValue) public {
+        dataType = newDataType;
         oracles = newOracle;
         bftValue = newBftValue;
         gravityContract = newGravityContract;
     }
+    
+    receive() external payable { } 
 
-    function () external payable {}
-
+    //----------------------------------public getters--------------------------------------------------------------
 
     function getOracles() public view returns(address[] memory) {
         return oracles;
     }
 
-    function getSubscriptionIds() public view returns(bytes32[] memory) {
+    function getSubscribersIds() public view returns(bytes32[] memory) {
         return subscriptionIds;
     }
 
-    function confirmData(bytes32 dataHash, uint8[] memory v, bytes32[] memory r, bytes32[] memory s) public {
+    function hashNewOracles(address[] memory newOracles) public pure returns(bytes32) {
+        bytes memory data;
+        for(uint i = 0; i < newOracles.length; i++) {
+            data = abi.encodePacked(data, newOracles[i]);
+        }
+
+        return keccak256(data);
+    }
+
+    //----------------------------------public setters--------------------------------------------------------------
+
+    function sendHashValue(bytes32 dataHash, uint8[] memory v, bytes32[] memory r, bytes32[] memory s) public {
         uint256 count = 0;
 
         for(uint i = 0; i < oracles.length; i++) {
@@ -50,32 +67,12 @@ contract Nebula {
         }
 
         require(count >= bftValue, "invalid bft count");
-        pulses[block.number] = NModels.Pulse(dataHash);
+        
+        uint256 newPulseId = lastPulseId + 1;
+        pulses[newPulseId] = NModels.Pulse(dataHash, block.number);
 
-        emit NewPulse(block.number, dataHash);
-    }
-
-    function sendData(bytes calldata value, uint256 blockNumber, bytes32 subscriptionId) external {
-        require(blockNumber <= block.number + 1, "invalid block number");
-        require(keccak256(abi.encodePacked(value)) == pulses[blockNumber].dataHash, "hash mismatch");
-        require(isPublseSubSent[blockNumber][subscriptionId] == false, "sub sent");
-        isPublseSubSent[blockNumber][subscriptionId] = true;
-
-        uint256 startBalance = address(this).balance;
-        ISubscription(subscriptions[subscriptionId].contractAddress).attachData(value);
-        uint256 endBalance = address(this).balance;
-        uint256 profit = endBalance-startBalance;
-
-        require(profit >= subscriptions[subscriptionId].reward, "invalid reward");
-    }
-    
-    function subscribe(address payable contractAddress, uint8 minConfirmations, uint256 reward) public {
-        bytes32 id = keccak256(abi.encodePacked(abi.encodePacked(msg.sig, msg.sender, contractAddress, minConfirmations)));
-        require(subscriptions[id].owner == address(0x00), "rq is exist");
-        subscriptions[id] = NModels.Subscription(msg.sender, contractAddress, minConfirmations, reward);
-        QueueLib.push(subscriptionsQueue, id);
-        subscriptionIds.push(id);
-        emit NewSubscriber(id);
+        emit NewPulse(newPulseId, block.number, dataHash);
+        lastPulseId = newPulseId;
     }
 
     function updateOracles(address[] memory newOracles, uint8[] memory v, bytes32[] memory r, bytes32[] memory s, uint256 newRound) public {
@@ -92,12 +89,37 @@ contract Nebula {
        rounds[newRound] = true;
     }
 
-    function hashNewOracles(address[] memory newOracles) public pure returns(bytes32) {
-        bytes memory data;
-        for(uint i = 0; i < newOracles.length; i++) {
-            data = abi.encodePacked(data, newOracles[i]);
-        }
+    function sendValueToSubByte(bytes memory value, uint256 pulseId, bytes32 subId) public {
+        sendValueToSub(pulseId, subId);
+        ISubscriberBytes(subscriptions[subId].contractAddress).attachValue(value);
+    }
 
-        return keccak256(data);
+    function sendValueToSubInt(int64 value, uint256 pulseId, bytes32 subId) public {
+        sendValueToSub(pulseId, subId);
+        ISubscriberInt(subscriptions[subId].contractAddress).attachValue(value);
+    }
+
+    function sendValueToSubString(string memory value, uint256 pulseId, bytes32 subId) public {
+        sendValueToSub(pulseId, subId);
+        ISubscriberString(subscriptions[subId].contractAddress).attachValue(value);
+    }
+
+
+    //----------------------------------internals---------------------------------------------------------------------
+
+    function sendValueToSub(uint256 pulseId, bytes32 subId) internal {
+        require(pulseId <= block.number + 1, "invalid block number");
+        require(isPublseSubSent[pulseId][subId] == false, "sub sent");
+        
+        isPublseSubSent[pulseId][subId] = true;
+    }
+    
+    function subscribe(address payable contractAddress, uint8 minConfirmations, uint256 reward) public {
+        bytes32 id = keccak256(abi.encodePacked(abi.encodePacked(msg.sig, msg.sender, contractAddress, minConfirmations)));
+        require(subscriptions[id].owner == address(0x00), "rq is exist");
+        subscriptions[id] = NModels.Subscription(msg.sender, contractAddress, minConfirmations, reward);
+        QueueLib.push(subscriptionsQueue, id);
+        subscriptionIds.push(id);
+        emit NewSubscriber(id);
     }
 }
