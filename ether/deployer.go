@@ -130,7 +130,7 @@ func deployLUPort(addresses *helpers.DeployedAddresses, fromAddress common.Addre
 	}
 	bind.WaitMined(context.Background(), ethConnection, tx)
 
-	tx, err = token	.Mint(transactor, oracles[0], big.NewInt(100000000000))
+	tx, err = token.Mint(transactor, luportAddress, big.NewInt(100000000000))
 	if err != nil {
 		log.Fatal(err)
 	}

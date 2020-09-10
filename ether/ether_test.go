@@ -17,12 +17,14 @@ import (
     "github.com/ethereum/go-ethereum/accounts/abi/bind"
     "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 var ethConnection *ethclient.Client
 var config helpers.Config
 var addresses helpers.DeployedAddresses
 var nebulaContract *nebula.Nebula
+var nebulaReverseContract *nebula.Nebula
 var ibportContract *ibport.IBPort
 var luportContract *luport.LUPort
 
@@ -54,6 +56,10 @@ func BindContracts() {
     if err != nil {
         log.Fatal(err)
     }
+	nebulaReverseContract, err = nebula.NewNebula(common.HexToAddress(addresses.NebulaReverse), ethConnection)
+    if err != nil {
+        log.Fatal(err)
+    }
 	ibportContract, err = ibport.NewIBPort(common.HexToAddress(addresses.IBPort), ethConnection)
     if err != nil {
         log.Fatal(err)
@@ -64,11 +70,11 @@ func BindContracts() {
     }
 }
 
-func signData(dataHash [32]byte, validSignsCount int) (*big.Int) {
+func signData(dataHash [32]byte, validSignsCount int, isReverse bool) (*big.Int) {
     var r [5][32]byte
     var s [5][32]byte
-    var v [5]uint8
-
+	var v [5]uint8
+	
     privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
     if err != nil {
         log.Fatal(err)
@@ -109,11 +115,20 @@ func signData(dataHash [32]byte, validSignsCount int) (*big.Int) {
         } else {
             v[position] = 0 // generate invalid signature
         }
-    }
+	}
+	
+	var tx *types.Transaction
 
-    tx, err := nebulaContract.SendHashValue(auth, dataHash, v[:], r[:], s[:])
-    if err != nil {
-        return nil
+	if !isReverse {
+    	tx, err = nebulaContract.SendHashValue(auth, dataHash, v[:], r[:], s[:])
+		if err != nil {
+			return nil
+		}
+	} else {
+    	tx, err = nebulaReverseContract.SendHashValue(auth, dataHash, v[:], r[:], s[:])
+		if err != nil {
+			return nil
+		}
 	}
 	
 	receipt, err := bind.WaitMined(context.Background(), ethConnection, tx)
@@ -121,12 +136,19 @@ func signData(dataHash [32]byte, validSignsCount int) (*big.Int) {
         log.Fatal(err)
 	}
 
-	pulseEvent, err := nebulaContract.NebulaFilterer.ParseNewPulse(*receipt.Logs[0])
-    if err != nil {
-        log.Fatal(err)
+	if !isReverse {
+		pulseEvent, err := nebulaContract.NebulaFilterer.ParseNewPulse(*receipt.Logs[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		return pulseEvent.PulseId
+	} else {
+		pulseEvent, err := nebulaReverseContract.NebulaFilterer.ParseNewPulse(*receipt.Logs[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		return pulseEvent.PulseId
 	}
-
-	return pulseEvent.PulseId
 }
 
 func TestMain(m *testing.M) {
@@ -165,15 +187,23 @@ func bytes32fromhex(s string) ([32]byte) {
 	return ret
 }
 
-func sendData(key string, value []byte, blockNumber *big.Int, subscriptionId [32]byte) (bool) {
+func sendData(key string, value []byte, blockNumber *big.Int, subscriptionId [32]byte, isReverse bool) (bool) {
     privateKey, err := crypto.HexToECDSA(key)
     if err != nil {
         log.Fatal(err)
     }
-    auth := bind.NewKeyedTransactor(privateKey)
-    _, err = nebulaContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
-    if err != nil {
-        return false
+	auth := bind.NewKeyedTransactor(privateKey)
+	if !isReverse {
+		_, err = nebulaContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
+		if err != nil {
+			return false
+		}
+	} else {
+		_, err = nebulaReverseContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
+		if err != nil {
+			log.Fatal(err)
+			return false
+		}
 	}
     return true
 }
@@ -181,7 +211,7 @@ func sendData(key string, value []byte, blockNumber *big.Int, subscriptionId [32
 
 func TestPulseSaved(t *testing.T) {
 	d := Random32Byte()
-	pulseId := signData(d, 5)
+	pulseId := signData(d, 5, false)
 	if pulseId == nil {
 		t.Error("can't send signed data")
 	} else {
@@ -199,14 +229,14 @@ func TestPulseSaved(t *testing.T) {
 
 func TestPulseCorrect3(t *testing.T) {
 	d := Random32Byte()
-	if signData(d, 3) == nil {
+	if signData(d, 3, false) == nil {
 		t.Error("can't send signed data")
 	}
 }
 
 func TestPulseInCorrect2(t *testing.T) {
 	d := Random32Byte()
-	if signData(d, 2) != nil {
+	if signData(d, 2, false) != nil {
 		t.Error("transaction 2/3 valid sigs should be rejected")
 	}
 }
@@ -219,10 +249,10 @@ func TestInvalidHash(t *testing.T) {
 	// generate invalid proof
 	proof := crypto.Keccak256Hash(attachedData[:])
 
-	pulseId := signData(proof, 5)
+	pulseId := signData(proof, 5, false)
 	if pulseId == nil {
 		t.Error("can't submit proof")
-	} else if sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
+	} else if sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId), false) {
 		t.Error("this tx should fail because of invalid hash")
 	}
 }
@@ -236,10 +266,10 @@ func TestMint(t *testing.T) {
 	filladdress(attachedData[:], 1+32+32, "9561C133DD8580860B6b7E504bC5Aa500f0f0103") // address
 
 	proof := crypto.Keccak256Hash(attachedData[:])
-	pulseId := signData(proof, 5)
+	pulseId := signData(proof, 5, false)
 	if pulseId == nil {
 		t.Error("can't submit proof")
-	} else if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
+	} else if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId), false) {
 		t.Error("can't submit data")
 	}
 }
@@ -252,12 +282,12 @@ func TestChangeStatusFail(t *testing.T) {
 	attachedData[1+32] = 1
 
 	proof := crypto.Keccak256Hash(attachedData[:])
-	pulseId := signData(proof, 5)
+	pulseId := signData(proof, 5, false)
 	if pulseId == nil {
 		t.Error("can't submit proof")
 	}
 
-	if sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
+	if sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId), false) {
 		t.Error("request should fail")
 	}
 }
@@ -295,18 +325,17 @@ func TestChangeStatusOk(t *testing.T) {
 	} else {
 		var attachedData [1+32+1]byte
 		attachedData[0] = 'c' // change status
-		filluint(attachedData[:], 1, 0)
-		attachedData[32] = reqId.Bytes()[0]
+		filluint(attachedData[:], 1, reqId.Uint64())
 
 		attachedData[1+32] = 2 // next status
 
 		proof := crypto.Keccak256Hash(attachedData[:])
-		pulseId := signData(proof, 5)
+		pulseId := signData(proof, 5, false)
 		if pulseId == nil {
 			t.Error("can't submit proof")
 		}
 
-		if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
+		if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId), false) {
 			t.Error("request failed", pulseId)
 		}
 	}
@@ -336,6 +365,60 @@ func TestLock(t *testing.T) {
 			requestStruct, _ := luportContract.Requests(nil, newRequestEvent.SwapId);
 			if requestStruct.Amount.Cmp(amount) != 0 {
 				t.Error("failed")
+			} else if requestStruct.Status != 1 {
+				t.Error("unexpected status", requestStruct.Status)
+			}
+		}
+	}
+}
+
+func TestUnlock(t *testing.T) {
+	var attachedData [1+32+32+20]byte
+
+	attachedData[0] = 'u' // unlock
+	filluint(attachedData[:], 1, 123456789) // req id
+	filluint(attachedData[:], 1+32, 10) // amount = 10
+	filladdress(attachedData[:], 1+32+32, "9561C133DD8580860B6b7E504bC5Aa500f0f0103") // address
+
+	proof := crypto.Keccak256Hash(attachedData[:])
+	pulseId := signData(proof, 5, true)
+	if pulseId == nil {
+		t.Error("can't submit proof")
+	} else if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.ReverseSubscriptionId), true) {
+		t.Error("can't submit data")
+	}
+}
+
+func TestApprove(t *testing.T) {
+	var attachedData [1+32]byte
+	var dummyAddress [32]byte
+
+	amount := big.NewInt(12345)
+
+	privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
+	if err != nil {
+		t.Error(err)
+	}
+
+	auth := bind.NewKeyedTransactor(privateKey)
+
+	tx, err := luportContract.CreateTransferUnwrapRequest(auth, amount, dummyAddress)
+	if err != nil {
+		t.Error(err)
+	} else {
+		receipt, err := bind.WaitMined(context.Background(), ethConnection, tx)
+		newRequestEvent, err := luportContract.LUPortFilterer.ParseNewRequest(*receipt.Logs[2])
+		if err != nil {
+			t.Error(err)
+		} else {
+			attachedData[0] = 'a' // unlock
+			filluint(attachedData[:], 1, newRequestEvent.SwapId.Uint64()) // req id
+			proof := crypto.Keccak256Hash(attachedData[:])
+			pulseId := signData(proof, 5, true)
+			if pulseId == nil {
+				t.Error("can't submit proof")
+			} else if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.ReverseSubscriptionId), true) {
+				t.Error("can't submit data")
 			}
 		}
 	}
