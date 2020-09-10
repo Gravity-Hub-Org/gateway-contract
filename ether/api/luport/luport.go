@@ -6522,18 +6522,22 @@ func (_ISubscriberBytes *ISubscriberBytesTransactorSession) AttachValue(value []
 }
 
 // LUPortABI is the input ABI used to generate the binding from.
-const LUPortABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nebula\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"value\",\"type\":\"bytes\"}],\"name\":\"attachValue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"}],\"name\":\"createTransferUnwrapRequest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nebula\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tokenAddress\",\"outputs\":[{\"internalType\":\"contractToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const LUPortABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_nebula\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"value\",\"type\":\"bytes\"}],\"name\":\"attachValue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"receiver\",\"type\":\"bytes32\"}],\"name\":\"createTransferUnwrapRequest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFirstRequestId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastReqId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nebula\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"requests\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"homeAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"foreignAddress\",\"type\":\"bytes32\"},{\"internalType\":\"enumLUPort.RequestStatus\",\"name\":\"status\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requestsQueue\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"first\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"last\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tokenAddress\",\"outputs\":[{\"internalType\":\"contractToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // LUPortFuncSigs maps the 4-byte function signature to its string representation.
 var LUPortFuncSigs = map[string]string{
 	"cc32a151": "attachValue(bytes)",
-	"215a6eb3": "createTransferUnwrapRequest(uint256,address)",
+	"ab9a9916": "createTransferUnwrapRequest(uint256,bytes32)",
+	"acedcc5a": "getFirstRequestId()",
+	"b5532d9d": "lastReqId()",
 	"4ecde849": "nebula()",
+	"81d12c58": "requests(uint256)",
+	"56dcda94": "requestsQueue()",
 	"9d76ea58": "tokenAddress()",
 }
 
 // LUPortBin is the compiled bytecode used for deploying new contracts.
-var LUPortBin = "0x608060405234801561001057600080fd5b506040516101e93803806101e98339818101604052604081101561003357600080fd5b508051602090910151600080546001600160a01b039384166001600160a01b0319918216179091556001805493909216921691909117905561016f8061007a6000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c8063215a6eb3146100515780634ecde8491461007f5780639d76ea58146100a3578063cc32a151146100ab575b600080fd5b61007d6004803603604081101561006757600080fd5b50803590602001356001600160a01b0316610117565b005b61008761011b565b604080516001600160a01b039092168252519081900360200190f35b61008761012a565b61007d600480360360208110156100c157600080fd5b8101906020810181356401000000008111156100dc57600080fd5b8201836020820111156100ee57600080fd5b8035906020019184600183028401116401000000008311171561011057600080fd5b5090925090505b5050565b6000546001600160a01b031681565b6001546001600160a01b03168156fea26469706673582212204bdfb5ef6a945b84693f4392bf7c92c02e8a144fe839c997fd56bb55eb8f229864736f6c63430007010033"
+var LUPortBin = "0x6080604052600160025534801561001557600080fd5b506040516109663803806109668339818101604052604081101561003857600080fd5b508051602090910151600080546001600160a01b039384166001600160a01b031991821617909155600180549390921692169190911790556108e78061007f6000396000f3fe608060405234801561001057600080fd5b50600436106100885760003560e01c8063ab9a99161161005b578063ab9a991614610136578063acedcc5a1461015b578063b5532d9d14610175578063cc32a1511461017d57610088565b80634ecde8491461008d57806356dcda94146100b157806381d12c58146100d25780639d76ea581461012e575b600080fd5b6100956101ed565b604080516001600160a01b039092168252519081900360200190f35b6100b96101fc565b6040805192835260208301919091528051918290030190f35b6100ef600480360360208110156100e857600080fd5b5035610205565b60405180856001600160a01b0316815260200184815260200183815260200182600281111561011a57fe5b815260200194505050505060405180910390f35b61009561023b565b6101596004803603604081101561014c57600080fd5b508035906020013561024a565b005b61016361041e565b60408051918252519081900360200190f35b610163610424565b6101596004803603602081101561019357600080fd5b8101906020810181356401000000008111156101ae57600080fd5b8201836020820111156101c057600080fd5b803590602001918460018302840111640100000000831117156101e257600080fd5b50909250905061042a565b6000546001600160a01b031681565b60045460055482565b600360208190526000918252604090912080546001820154600283015492909301546001600160a01b0390911692919060ff1684565b6001546001600160a01b031681565b600154604080516323b872dd60e01b81523360048201523060248201526044810185905290516001600160a01b03909216916323b872dd916064808201926020929091908290030181600087803b1580156102a457600080fd5b505af11580156102b8573d6000803e3d6000fd5b505050506040513d60208110156102ce57600080fd5b5051610317576040805162461bcd60e51b815260206004820152601360248201527263616e2774207472616e736665722066726f6d60681b604482015290519081900360640190fd5b60408051608081018252338152602080820185815282840185815260016060850181815260028054600090815260039687905297909720865181546001600160a01b0319166001600160a01b039091161781559351848301559151838701559051928201805494959294909260ff199091169190849081111561039657fe5b02179055505060025460408051632941b65560e21b815260048181015260248101929092525173__$9e8e06cf00219ff9bf6fefc812eef484ba$__925063a506d95491604480820192600092909190829003018186803b1580156103f957600080fd5b505af415801561040d573d6000803e3d6000fd5b505060028054600101905550505050565b60045490565b60025481565b6000546001600160a01b03163314610479576040805162461bcd60e51b815260206004820152600d60248201526c1858d8d95cdcc819195b9a5959609a1b604482015290519081900360640190fd5b60005b8181101561066757600083838381811061049257fe5b6001909401936001600160f81b031992013591909116915050607560f81b8114156105b25760006104fd85858080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508792506020915061066c9050565b9050602083019250600061054b86868080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508892506020915061066c9050565b9050602084019350600061059687878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508992506106ad915050565b90506014850194506105a98383836106c2565b50505050610662565b6001600160f81b03198116606160f81b141561062657600061060e85858080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508792506020915061066c9050565b905060208301925061061f81610825565b5050610662565b6040805162461bcd60e51b815260206004820152600c60248201526b696e76616c6964206461746160a01b604482015290519081900360640190fd5b61047c565b505050565b600080835b8385018110156106a45785818151811061068757fe5b60209101015160f81c610100929092029190910190600101610671565b50949350505050565b60006106bb8383601461066c565b9392505050565b6001546040805163a9059cbb60e01b81526001600160a01b038481166004830152602482018690529151919092169163a9059cbb9160448083019260209291908290030181600087803b15801561071857600080fd5b505af115801561072c573d6000803e3d6000fd5b505050506040513d602081101561074257600080fd5b5051610795576040805162461bcd60e51b815260206004820152601c60248201527f63616e2774207472616e736665722066726f6d20636f6e747261637400000000604482015290519081900360640190fd5b604080516080810182526001600160a01b038381168252602080830186815260008486018181526002606087018181528b845260039586905297909220865181546001600160a01b0319169616959095178555915160018086019190915591518482015594519183018054949593949293909260ff19169190849081111561081957fe5b02179055505050505050565b6000818152600360208190526040808320909101805460ff191660021790558051639d6ad84b60e01b815260048082015260248101849052905173__$9e8e06cf00219ff9bf6fefc812eef484ba$__92639d6ad84b9260448082019391829003018186803b15801561089657600080fd5b505af41580156108aa573d6000803e3d6000fd5b505050505056fea264697066735822122010a171f911f836495c9b34ad6ad2b2a8439de8fa0479405a8b6a354d86d0ae7064736f6c63430007010033"
 
 // DeployLUPort deploys a new Ethereum contract, binding an instance of LUPort to it.
 func DeployLUPort(auth *bind.TransactOpts, backend bind.ContractBackend, _nebula common.Address, _tokenAddress common.Address) (common.Address, *types.Transaction, *LUPort, error) {
@@ -6541,6 +6545,9 @@ func DeployLUPort(auth *bind.TransactOpts, backend bind.ContractBackend, _nebula
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
+
+	queueLibAddr, _, _, _ := DeployQueueLib(auth, backend)
+	LUPortBin = strings.Replace(LUPortBin, "__$9e8e06cf00219ff9bf6fefc812eef484ba$__", queueLibAddr.String()[2:], -1)
 
 	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(LUPortBin), backend, _nebula, _tokenAddress)
 	if err != nil {
@@ -6691,6 +6698,58 @@ func (_LUPort *LUPortTransactorRaw) Transact(opts *bind.TransactOpts, method str
 	return _LUPort.Contract.contract.Transact(opts, method, params...)
 }
 
+// GetFirstRequestId is a free data retrieval call binding the contract method 0xacedcc5a.
+//
+// Solidity: function getFirstRequestId() view returns(uint256)
+func (_LUPort *LUPortCaller) GetFirstRequestId(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _LUPort.contract.Call(opts, out, "getFirstRequestId")
+	return *ret0, err
+}
+
+// GetFirstRequestId is a free data retrieval call binding the contract method 0xacedcc5a.
+//
+// Solidity: function getFirstRequestId() view returns(uint256)
+func (_LUPort *LUPortSession) GetFirstRequestId() (*big.Int, error) {
+	return _LUPort.Contract.GetFirstRequestId(&_LUPort.CallOpts)
+}
+
+// GetFirstRequestId is a free data retrieval call binding the contract method 0xacedcc5a.
+//
+// Solidity: function getFirstRequestId() view returns(uint256)
+func (_LUPort *LUPortCallerSession) GetFirstRequestId() (*big.Int, error) {
+	return _LUPort.Contract.GetFirstRequestId(&_LUPort.CallOpts)
+}
+
+// LastReqId is a free data retrieval call binding the contract method 0xb5532d9d.
+//
+// Solidity: function lastReqId() view returns(uint256)
+func (_LUPort *LUPortCaller) LastReqId(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _LUPort.contract.Call(opts, out, "lastReqId")
+	return *ret0, err
+}
+
+// LastReqId is a free data retrieval call binding the contract method 0xb5532d9d.
+//
+// Solidity: function lastReqId() view returns(uint256)
+func (_LUPort *LUPortSession) LastReqId() (*big.Int, error) {
+	return _LUPort.Contract.LastReqId(&_LUPort.CallOpts)
+}
+
+// LastReqId is a free data retrieval call binding the contract method 0xb5532d9d.
+//
+// Solidity: function lastReqId() view returns(uint256)
+func (_LUPort *LUPortCallerSession) LastReqId() (*big.Int, error) {
+	return _LUPort.Contract.LastReqId(&_LUPort.CallOpts)
+}
+
 // Nebula is a free data retrieval call binding the contract method 0x4ecde849.
 //
 // Solidity: function nebula() view returns(address)
@@ -6715,6 +6774,86 @@ func (_LUPort *LUPortSession) Nebula() (common.Address, error) {
 // Solidity: function nebula() view returns(address)
 func (_LUPort *LUPortCallerSession) Nebula() (common.Address, error) {
 	return _LUPort.Contract.Nebula(&_LUPort.CallOpts)
+}
+
+// Requests is a free data retrieval call binding the contract method 0x81d12c58.
+//
+// Solidity: function requests(uint256 ) view returns(address homeAddress, uint256 amount, bytes32 foreignAddress, uint8 status)
+func (_LUPort *LUPortCaller) Requests(opts *bind.CallOpts, arg0 *big.Int) (struct {
+	HomeAddress    common.Address
+	Amount         *big.Int
+	ForeignAddress [32]byte
+	Status         uint8
+}, error) {
+	ret := new(struct {
+		HomeAddress    common.Address
+		Amount         *big.Int
+		ForeignAddress [32]byte
+		Status         uint8
+	})
+	out := ret
+	err := _LUPort.contract.Call(opts, out, "requests", arg0)
+	return *ret, err
+}
+
+// Requests is a free data retrieval call binding the contract method 0x81d12c58.
+//
+// Solidity: function requests(uint256 ) view returns(address homeAddress, uint256 amount, bytes32 foreignAddress, uint8 status)
+func (_LUPort *LUPortSession) Requests(arg0 *big.Int) (struct {
+	HomeAddress    common.Address
+	Amount         *big.Int
+	ForeignAddress [32]byte
+	Status         uint8
+}, error) {
+	return _LUPort.Contract.Requests(&_LUPort.CallOpts, arg0)
+}
+
+// Requests is a free data retrieval call binding the contract method 0x81d12c58.
+//
+// Solidity: function requests(uint256 ) view returns(address homeAddress, uint256 amount, bytes32 foreignAddress, uint8 status)
+func (_LUPort *LUPortCallerSession) Requests(arg0 *big.Int) (struct {
+	HomeAddress    common.Address
+	Amount         *big.Int
+	ForeignAddress [32]byte
+	Status         uint8
+}, error) {
+	return _LUPort.Contract.Requests(&_LUPort.CallOpts, arg0)
+}
+
+// RequestsQueue is a free data retrieval call binding the contract method 0x56dcda94.
+//
+// Solidity: function requestsQueue() view returns(bytes32 first, bytes32 last)
+func (_LUPort *LUPortCaller) RequestsQueue(opts *bind.CallOpts) (struct {
+	First [32]byte
+	Last  [32]byte
+}, error) {
+	ret := new(struct {
+		First [32]byte
+		Last  [32]byte
+	})
+	out := ret
+	err := _LUPort.contract.Call(opts, out, "requestsQueue")
+	return *ret, err
+}
+
+// RequestsQueue is a free data retrieval call binding the contract method 0x56dcda94.
+//
+// Solidity: function requestsQueue() view returns(bytes32 first, bytes32 last)
+func (_LUPort *LUPortSession) RequestsQueue() (struct {
+	First [32]byte
+	Last  [32]byte
+}, error) {
+	return _LUPort.Contract.RequestsQueue(&_LUPort.CallOpts)
+}
+
+// RequestsQueue is a free data retrieval call binding the contract method 0x56dcda94.
+//
+// Solidity: function requestsQueue() view returns(bytes32 first, bytes32 last)
+func (_LUPort *LUPortCallerSession) RequestsQueue() (struct {
+	First [32]byte
+	Last  [32]byte
+}, error) {
+	return _LUPort.Contract.RequestsQueue(&_LUPort.CallOpts)
 }
 
 // TokenAddress is a free data retrieval call binding the contract method 0x9d76ea58.
@@ -6764,24 +6903,24 @@ func (_LUPort *LUPortTransactorSession) AttachValue(value []byte) (*types.Transa
 	return _LUPort.Contract.AttachValue(&_LUPort.TransactOpts, value)
 }
 
-// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0x215a6eb3.
+// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0xab9a9916.
 //
-// Solidity: function createTransferUnwrapRequest(uint256 amount, address receiver) returns()
-func (_LUPort *LUPortTransactor) CreateTransferUnwrapRequest(opts *bind.TransactOpts, amount *big.Int, receiver common.Address) (*types.Transaction, error) {
+// Solidity: function createTransferUnwrapRequest(uint256 amount, bytes32 receiver) returns()
+func (_LUPort *LUPortTransactor) CreateTransferUnwrapRequest(opts *bind.TransactOpts, amount *big.Int, receiver [32]byte) (*types.Transaction, error) {
 	return _LUPort.contract.Transact(opts, "createTransferUnwrapRequest", amount, receiver)
 }
 
-// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0x215a6eb3.
+// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0xab9a9916.
 //
-// Solidity: function createTransferUnwrapRequest(uint256 amount, address receiver) returns()
-func (_LUPort *LUPortSession) CreateTransferUnwrapRequest(amount *big.Int, receiver common.Address) (*types.Transaction, error) {
+// Solidity: function createTransferUnwrapRequest(uint256 amount, bytes32 receiver) returns()
+func (_LUPort *LUPortSession) CreateTransferUnwrapRequest(amount *big.Int, receiver [32]byte) (*types.Transaction, error) {
 	return _LUPort.Contract.CreateTransferUnwrapRequest(&_LUPort.TransactOpts, amount, receiver)
 }
 
-// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0x215a6eb3.
+// CreateTransferUnwrapRequest is a paid mutator transaction binding the contract method 0xab9a9916.
 //
-// Solidity: function createTransferUnwrapRequest(uint256 amount, address receiver) returns()
-func (_LUPort *LUPortTransactorSession) CreateTransferUnwrapRequest(amount *big.Int, receiver common.Address) (*types.Transaction, error) {
+// Solidity: function createTransferUnwrapRequest(uint256 amount, bytes32 receiver) returns()
+func (_LUPort *LUPortTransactorSession) CreateTransferUnwrapRequest(amount *big.Int, receiver [32]byte) (*types.Transaction, error) {
 	return _LUPort.Contract.CreateTransferUnwrapRequest(&_LUPort.TransactOpts, amount, receiver)
 }
 
@@ -7242,6 +7381,175 @@ func (_Pausable *PausableFilterer) ParseUnpaused(log types.Log) (*PausableUnpaus
 		return nil, err
 	}
 	return event, nil
+}
+
+// QueueLibABI is the input ABI used to generate the binding from.
+const QueueLibABI = "[]"
+
+// QueueLibFuncSigs maps the 4-byte function signature to its string representation.
+var QueueLibFuncSigs = map[string]string{
+	"9d6ad84b": "drop(QueueLib.Queue storage,bytes32)",
+	"870a61ff": "next(QueueLib.Queue storage,bytes32)",
+	"a506d954": "push(QueueLib.Queue storage,bytes32)",
+}
+
+// QueueLibBin is the compiled bytecode used for deploying new contracts.
+var QueueLibBin = "0x6101fc610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe730000000000000000000000000000000000000000301460806040526004361061004b5760003560e01c8063870a61ff146100505780639d6ad84b14610085578063a506d954146100b7575b600080fd5b6100736004803603604081101561006657600080fd5b50803590602001356100e7565b60408051918252519081900360200190f35b81801561009157600080fd5b506100b5600480360360408110156100a857600080fd5b508035906020013561010f565b005b8180156100c357600080fd5b506100b5600480360360408110156100da57600080fd5b508035906020013561017e565b6000816100f657508154610109565b5060008181526002830160205260409020545b92915050565b8154811480156101225750808260010154145b15610136576000808355600183015561017a565b8154811415610157576000818152600283016020526040902054825561017a565b808260010154141561017a57600081815260038301602052604090205460018301555b5050565b8154610193578082556001820181905561017a565b6001820180546000908152600284016020908152604080832085905583548584526003870190925290912055819055505056fea26469706673582212200c8c99c74113d501e1bc47119ad13c1cb4586f42e659b28f6d5f381259ac974564736f6c63430007010033"
+
+// DeployQueueLib deploys a new Ethereum contract, binding an instance of QueueLib to it.
+func DeployQueueLib(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *QueueLib, error) {
+	parsed, err := abi.JSON(strings.NewReader(QueueLibABI))
+	if err != nil {
+		return common.Address{}, nil, nil, err
+	}
+
+	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(QueueLibBin), backend)
+	if err != nil {
+		return common.Address{}, nil, nil, err
+	}
+	return address, tx, &QueueLib{QueueLibCaller: QueueLibCaller{contract: contract}, QueueLibTransactor: QueueLibTransactor{contract: contract}, QueueLibFilterer: QueueLibFilterer{contract: contract}}, nil
+}
+
+// QueueLib is an auto generated Go binding around an Ethereum contract.
+type QueueLib struct {
+	QueueLibCaller     // Read-only binding to the contract
+	QueueLibTransactor // Write-only binding to the contract
+	QueueLibFilterer   // Log filterer for contract events
+}
+
+// QueueLibCaller is an auto generated read-only Go binding around an Ethereum contract.
+type QueueLibCaller struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// QueueLibTransactor is an auto generated write-only Go binding around an Ethereum contract.
+type QueueLibTransactor struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// QueueLibFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type QueueLibFilterer struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// QueueLibSession is an auto generated Go binding around an Ethereum contract,
+// with pre-set call and transact options.
+type QueueLibSession struct {
+	Contract     *QueueLib         // Generic contract binding to set the session for
+	CallOpts     bind.CallOpts     // Call options to use throughout this session
+	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
+}
+
+// QueueLibCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// with pre-set call options.
+type QueueLibCallerSession struct {
+	Contract *QueueLibCaller // Generic contract caller binding to set the session for
+	CallOpts bind.CallOpts   // Call options to use throughout this session
+}
+
+// QueueLibTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// with pre-set transact options.
+type QueueLibTransactorSession struct {
+	Contract     *QueueLibTransactor // Generic contract transactor binding to set the session for
+	TransactOpts bind.TransactOpts   // Transaction auth options to use throughout this session
+}
+
+// QueueLibRaw is an auto generated low-level Go binding around an Ethereum contract.
+type QueueLibRaw struct {
+	Contract *QueueLib // Generic contract binding to access the raw methods on
+}
+
+// QueueLibCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+type QueueLibCallerRaw struct {
+	Contract *QueueLibCaller // Generic read-only contract binding to access the raw methods on
+}
+
+// QueueLibTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+type QueueLibTransactorRaw struct {
+	Contract *QueueLibTransactor // Generic write-only contract binding to access the raw methods on
+}
+
+// NewQueueLib creates a new instance of QueueLib, bound to a specific deployed contract.
+func NewQueueLib(address common.Address, backend bind.ContractBackend) (*QueueLib, error) {
+	contract, err := bindQueueLib(address, backend, backend, backend)
+	if err != nil {
+		return nil, err
+	}
+	return &QueueLib{QueueLibCaller: QueueLibCaller{contract: contract}, QueueLibTransactor: QueueLibTransactor{contract: contract}, QueueLibFilterer: QueueLibFilterer{contract: contract}}, nil
+}
+
+// NewQueueLibCaller creates a new read-only instance of QueueLib, bound to a specific deployed contract.
+func NewQueueLibCaller(address common.Address, caller bind.ContractCaller) (*QueueLibCaller, error) {
+	contract, err := bindQueueLib(address, caller, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &QueueLibCaller{contract: contract}, nil
+}
+
+// NewQueueLibTransactor creates a new write-only instance of QueueLib, bound to a specific deployed contract.
+func NewQueueLibTransactor(address common.Address, transactor bind.ContractTransactor) (*QueueLibTransactor, error) {
+	contract, err := bindQueueLib(address, nil, transactor, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &QueueLibTransactor{contract: contract}, nil
+}
+
+// NewQueueLibFilterer creates a new log filterer instance of QueueLib, bound to a specific deployed contract.
+func NewQueueLibFilterer(address common.Address, filterer bind.ContractFilterer) (*QueueLibFilterer, error) {
+	contract, err := bindQueueLib(address, nil, nil, filterer)
+	if err != nil {
+		return nil, err
+	}
+	return &QueueLibFilterer{contract: contract}, nil
+}
+
+// bindQueueLib binds a generic wrapper to an already deployed contract.
+func bindQueueLib(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+	parsed, err := abi.JSON(strings.NewReader(QueueLibABI))
+	if err != nil {
+		return nil, err
+	}
+	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+}
+
+// Call invokes the (constant) contract method with params as input values and
+// sets the output to result. The result type might be a single field for simple
+// returns, a slice of interfaces for anonymous returns and a struct for named
+// returns.
+func (_QueueLib *QueueLibRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _QueueLib.Contract.QueueLibCaller.contract.Call(opts, result, method, params...)
+}
+
+// Transfer initiates a plain transaction to move funds to the contract, calling
+// its default method if one is available.
+func (_QueueLib *QueueLibRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _QueueLib.Contract.QueueLibTransactor.contract.Transfer(opts)
+}
+
+// Transact invokes the (paid) contract method with params as input values.
+func (_QueueLib *QueueLibRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _QueueLib.Contract.QueueLibTransactor.contract.Transact(opts, method, params...)
+}
+
+// Call invokes the (constant) contract method with params as input values and
+// sets the output to result. The result type might be a single field for simple
+// returns, a slice of interfaces for anonymous returns and a struct for named
+// returns.
+func (_QueueLib *QueueLibCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _QueueLib.Contract.contract.Call(opts, result, method, params...)
+}
+
+// Transfer initiates a plain transaction to move funds to the contract, calling
+// its default method if one is available.
+func (_QueueLib *QueueLibTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _QueueLib.Contract.contract.Transfer(opts)
+}
+
+// Transact invokes the (paid) contract method with params as input values.
+func (_QueueLib *QueueLibTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _QueueLib.Contract.contract.Transact(opts, method, params...)
 }
 
 // SafeMathABI is the input ABI used to generate the binding from.
