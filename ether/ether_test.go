@@ -58,7 +58,7 @@ func BindContracts() {
     if err != nil {
         log.Fatal(err)
     }
-	luportContract, err = luport.NewLUPort(common.HexToAddress(addresses.IBPort), ethConnection)
+	luportContract, err = luport.NewLUPort(common.HexToAddress(addresses.LUPort), ethConnection)
     if err != nil {
         log.Fatal(err)
     }
@@ -308,6 +308,35 @@ func TestChangeStatusOk(t *testing.T) {
 
 		if !sendData(config.OraclePK[0], attachedData[:], pulseId, bytes32fromhex(addresses.SubscriptionId)) {
 			t.Error("request failed", pulseId)
+		}
+	}
+}
+
+func TestLock(t *testing.T) {
+	var dummyAddress [32]byte
+
+	amount := big.NewInt(12345)
+
+	privateKey, err := crypto.HexToECDSA(config.OraclePK[0])
+	if err != nil {
+		t.Error(err)
+	}
+
+	auth := bind.NewKeyedTransactor(privateKey)
+
+	tx, err := luportContract.CreateTransferUnwrapRequest(auth, amount, dummyAddress)
+	if err != nil {
+		t.Error(err)
+	} else {
+		receipt, err := bind.WaitMined(context.Background(), ethConnection, tx)
+		newRequestEvent, err := luportContract.LUPortFilterer.ParseNewRequest(*receipt.Logs[2])
+		if err != nil {
+			t.Error(err)
+		} else {
+			requestStruct, _ := luportContract.Requests(nil, newRequestEvent.SwapId);
+			if requestStruct.Amount.Cmp(amount) != 0 {
+				t.Error("failed")
+			}
 		}
 	}
 }

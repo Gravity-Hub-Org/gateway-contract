@@ -8,6 +8,8 @@ contract LUPort is ISubscriberBytes {
     address public nebula;
     Token public tokenAddress;
 
+    event NewRequest (uint swapId, uint amount, bytes32 receiver);
+
     enum RequestStatus {
         None,
         New,
@@ -87,6 +89,7 @@ contract LUPort is ISubscriberBytes {
         require(tokenAddress.transferFrom(msg.sender, address(this), amount), "can't transfer from");
         requests[lastReqId] = Request(msg.sender, amount, receiver, RequestStatus.New);
         QueueLib.push(requestsQueue, bytes32(lastReqId));
+        emit NewRequest(lastReqId, amount, receiver);
         lastReqId++;
     }
 

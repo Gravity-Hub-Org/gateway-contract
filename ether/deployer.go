@@ -124,7 +124,19 @@ func deployLUPort(addresses *helpers.DeployedAddresses, fromAddress common.Addre
 	bind.WaitMined(context.Background(), ethConnection, tx)
 	addresses.LUPort = common.Bytes2Hex(luportAddress.Bytes())
 
-	tx, err = token.Approve(transactor, oracles[0], big.NewInt(100000000000))
+	tx, err = token.Mint(transactor, fromAddress, big.NewInt(100000000000))
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+
+	tx, err = token	.Mint(transactor, oracles[0], big.NewInt(100000000000))
+	if err != nil {
+		log.Fatal(err)
+	}
+	bind.WaitMined(context.Background(), ethConnection, tx)
+
+	tx, err = token.Approve(transactor, luportAddress, big.NewInt(100000000000))
 	if err != nil {
 		log.Fatal(err)
 	}
