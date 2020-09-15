@@ -6,7 +6,12 @@ services:
 
     waves:
         image: wavesplatform/waves-private-node
-        
+
+    abigen:
+        build: docker/abigen
+        volumes: 
+            - ./ether:/source:rw
+                    
     golang:
         image: golang
         links: 
@@ -14,5 +19,5 @@ services:
             - waves
         volumes: 
             - ./:/go/src/rh_tests:rw
-        command: sh -c "cd /go/src/rh_tests/ether; go run rh_tests && go test && cd /go/src/rh_tests/waves && go test"
+        command: sh -c "cd /go/src/rh_tests; ./test.sh"
 
