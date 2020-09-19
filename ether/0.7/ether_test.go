@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
     "os"
     "log"
-    "math/big"
+	"math/big"
     "context"
     "crypto/ecdsa"
 	"math/rand"
@@ -144,6 +144,10 @@ func signData(dataHash [32]byte, validSignsCount int, isReverse bool) (*big.Int)
         log.Fatal(err)
 	}
 
+	if len(receipt.Logs) < 1 {
+		return nil
+	}
+
 	if !isReverse {
 		pulseEvent, err := nebulaContract.NebulaFilterer.ParseNewPulse(*receipt.Logs[0])
 		if err != nil {
@@ -202,17 +206,19 @@ func sendData(key string, value []byte, blockNumber *big.Int, subscriptionId [32
     }
 	auth := bind.NewKeyedTransactor(privateKey)
 	if !isReverse {
-		_, err = nebulaContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
+		tx, err := nebulaContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
 		if err != nil {
 			return false
 		}
-	} else {
-		_, err = nebulaReverseContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
-		if err != nil {
-			log.Fatal(err)
-			return false
+			bind.WaitMined(context.Background(), ethConnection, tx)
+		} else {
+			tx, err := nebulaReverseContract.SendValueToSubByte(auth, value, blockNumber, subscriptionId)
+			if err != nil {
+				log.Fatal(err)
+				return false
+			}
+			bind.WaitMined(context.Background(), ethConnection, tx)
 		}
-	}
     return true
 }
 
@@ -451,6 +457,7 @@ func TestApprove(t *testing.T) {
 			t.Error(err)
 		} else {
 			requests := getRequestsQueue()
+			log.Println("req len", len(requests))
 			r := findRequestById(requests, newRequestEvent.SwapId)
 			if r == nil {
 				t.Error("no request in queue")
@@ -465,6 +472,7 @@ func TestApprove(t *testing.T) {
 				t.Error("can't submit data")
 			}
 			requests = getRequestsQueue()
+			log.Println("req len", len(requests))
 			r = findRequestById(requests, newRequestEvent.SwapId)
 			if r != nil {
 				t.Error("request should not be in the queue")
