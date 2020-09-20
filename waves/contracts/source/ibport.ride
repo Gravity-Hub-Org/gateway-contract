@@ -51,15 +51,16 @@ let MINT = 1
 let CHANGESTATUS = 2
 
 #----Types--------
-let LOCKTYPE = 1
-let UNLOCKTYPE = 2
+let ISSUETYPE = 1
+let BURNTYPE = 2
 
 func mint(rqId: String, amount: Int, receiver: Address) = {
   if isDefined(getRqStatus(rqId)) then throw("invalid status key")
   else
     [
       Reissue(assetId, amount, true),
-      IntegerEntry(getRqStatusKey(rqId), COMPLETED)
+      IntegerEntry(getRqStatusKey(rqId), COMPLETED),
+      IntegerEntry(getRqTypeKey(rqId), ISSUETYPE)
     ]
 }
 
@@ -110,7 +111,7 @@ func createTransferUnwrapRq() = {
             
                 IntegerEntry(getRqAmountKey(rqId), pmt.amount),
                 IntegerEntry(getRqStatusKey(rqId), NEW),
-                IntegerEntry(getRqTypeKey(rqId), LOCKTYPE),
+                IntegerEntry(getRqTypeKey(rqId), BURNTYPE),
                 
                 Burn(assetId, pmt.amount)
             ]
