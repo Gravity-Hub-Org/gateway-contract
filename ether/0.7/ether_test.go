@@ -457,7 +457,6 @@ func TestApprove(t *testing.T) {
 			t.Error(err)
 		} else {
 			requests := getRequestsQueue()
-			log.Println("req len", len(requests))
 			r := findRequestById(requests, newRequestEvent.SwapId)
 			if r == nil {
 				t.Error("no request in queue")
@@ -472,7 +471,6 @@ func TestApprove(t *testing.T) {
 				t.Error("can't submit data")
 			}
 			requests = getRequestsQueue()
-			log.Println("req len", len(requests))
 			r = findRequestById(requests, newRequestEvent.SwapId)
 			if r != nil {
 				t.Error("request should not be in the queue")

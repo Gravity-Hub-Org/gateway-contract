@@ -18,7 +18,7 @@ library QueueLib {
             queue.first = nextElement;
         }
 
-        if (nextElement != bytes32(0)){
+        if (nextElement != bytes32(0)) {
             queue.prevElement[nextElement] = prevElement;
         } else {
             queue.last = prevElement;
