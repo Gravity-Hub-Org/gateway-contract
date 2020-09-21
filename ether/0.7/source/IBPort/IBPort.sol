@@ -2,10 +2,10 @@ pragma solidity ^0.7;
 
 import "../Token/Token.sol";
 import "../interfaces/ISubscriberBytes.sol";
-import "../lib/QueueLib.sol";
+import "../libs/Queue.sol";
 
 contract IBPort is ISubscriberBytes {
-    enum Status {
+    enum RequestStatus {
         None,
         New,
         Rejected,
@@ -26,7 +26,7 @@ contract IBPort is ISubscriberBytes {
 
     uint public requestPosition = 1;
 
-    mapping(uint => Status) public swapStatus;
+    mapping(uint => RequestStatus) public swapStatus;
     mapping(uint => UnwrapRequest) public unwrapRequests;
     QueueLib.Queue public requestsQueue;
 
@@ -47,13 +47,13 @@ contract IBPort is ISubscriberBytes {
         return address(uint160(deserializeUint(b, startPos, 20)));
     }
 
-    function deserializeStatus(bytes memory b, uint pos) internal pure returns (Status) {
+    function deserializeStatus(bytes memory b, uint pos) internal pure returns (RequestStatus) {
         uint d = uint(uint8(b[pos]));
-        if (d == 0) return Status.None;
-        if (d == 1) return Status.New;
-        if (d == 2) return Status.Rejected;
-        if (d == 3) return Status.Success;
-        if (d == 4) return Status.Returned;
+        if (d == 0) return RequestStatus.None;
+        if (d == 1) return RequestStatus.New;
+        if (d == 2) return RequestStatus.Rejected;
+        if (d == 3) return RequestStatus.Success;
+        if (d == 4) return RequestStatus.Returned;
         revert("invalid status");
     }
 
@@ -72,7 +72,7 @@ contract IBPort is ISubscriberBytes {
 
             if (action == bytes1("c")) {
                 uint swapId = deserializeUint(value, pos, 32); pos += 32;
-                Status newStatus = deserializeStatus(value, pos); pos += 1;
+                RequestStatus newStatus = deserializeStatus(value, pos); pos += 1;
                 changeStatus(swapId, newStatus);
                 continue;
             }
@@ -81,20 +81,20 @@ contract IBPort is ISubscriberBytes {
     }
 
     function mint(uint swapId, uint amount, address receiver) internal {
-        require(swapStatus[swapId] == Status.None, "invalid request status");
+        require(swapStatus[swapId] == RequestStatus.None, "invalid request status");
         Token(tokenAddress).mint(receiver, amount);
-        swapStatus[swapId] = Status.Success;
+        swapStatus[swapId] = RequestStatus.Success;
     }
 
-    function changeStatus(uint swapId, Status newStatus) internal {
-        require(swapStatus[swapId] == Status.New, "invalid request status");
+    function changeStatus(uint swapId, RequestStatus newStatus) internal {
+        require(swapStatus[swapId] == RequestStatus.New, "invalid request status");
         swapStatus[swapId] = newStatus;
     }
 
 
     function createTransferUnwrapRequest(uint amount, bytes32 receiver) public {
         unwrapRequests[requestPosition] = UnwrapRequest(msg.sender, receiver, amount);
-        swapStatus[requestPosition] = Status.New;
+        swapStatus[requestPosition] = RequestStatus.New;
         tokenAddress.burnFrom(msg.sender, amount);
         emit RequestCreated(requestPosition, msg.sender, receiver, amount);
     }
