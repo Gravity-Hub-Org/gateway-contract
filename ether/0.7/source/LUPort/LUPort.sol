@@ -35,7 +35,7 @@ contract LUPort is ISubscriberBytes {
 
     function deserializeUint(bytes memory b, uint startPos, uint len) internal pure returns (uint) {
         uint v = 0;
-        for (uint p = startPos + len - 1; p >= startPos; p--) {
+        for (uint p = startPos; p < startPos + len; p++) {
             v = v * 256 + uint(uint8(b[p]));
         }
         return v;

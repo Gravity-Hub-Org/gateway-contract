@@ -177,9 +177,9 @@ func Random32Byte() [32]byte {
 }
 
 func filluint(data []byte, pos uint, val uint64) {
-	var i uint
-	for i = 0; i < 32; i++ {
-		data[i + pos] = byte(val % 256)
+	var i int
+	for i = 31; i >= 0; i-- {
+		data[i + int(pos)] = byte(val % 256)
 		val = val / 256
 	}
 }
