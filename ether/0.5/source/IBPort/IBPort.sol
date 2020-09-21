@@ -1,4 +1,4 @@
-pragma solidity ^0.7;
+pragma solidity ^0.5;
 
 import "../Token/Token.sol";
 import "../interfaces/ISubscriberBytes.sol";
@@ -26,7 +26,7 @@ contract IBPort is ISubscriberBytes {
     mapping(uint => UnwrapRequest) public unwrapRequests;
     mapping(uint => Status) public swapStatus;
 
-    constructor(address _nebula, address _tokenAddress) {
+    constructor(address _nebula, address _tokenAddress) public {
         nebula = _nebula;
         tokenAddress = Token(_tokenAddress);
     }
@@ -53,7 +53,7 @@ contract IBPort is ISubscriberBytes {
         revert("invalid status");
     }
 
-    function attachValue(bytes calldata value) override external {
+    function attachValue(bytes calldata value) external {
         require(msg.sender == nebula, "access denied");
         for (uint pos = 0; pos < value.length; ) {
             bytes1 action = value[pos]; pos++;

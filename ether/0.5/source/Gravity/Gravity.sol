@@ -1,4 +1,4 @@
-pragma solidity ^0.7;
+pragma solidity ^0.5;
 
 import "../libs/Queue.sol";
 import "./Models.sol";

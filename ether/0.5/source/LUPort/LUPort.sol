@@ -1,4 +1,4 @@
-pragma solidity ^0.7;
+pragma solidity ^0.5;
 
 import "../Token/Token.sol";
 import "../interfaces/ISubscriberBytes.sol";
@@ -28,7 +28,7 @@ contract LUPort is ISubscriberBytes {
     mapping(uint => Request) public requests;
     QueueLib.Queue public requestsQueue;
 
-    constructor(address _nebula, address _tokenAddress) {
+    constructor(address _nebula, address _tokenAddress) public {
         nebula = _nebula;
         tokenAddress = Token(_tokenAddress);
     }
@@ -53,7 +53,7 @@ contract LUPort is ISubscriberBytes {
         revert("invalid status");
     }
 
-    function attachValue(bytes calldata value) external override {
+    function attachValue(bytes calldata value) external {
         require(msg.sender == nebula, "access denied");
         for (uint pos = 0; pos < value.length; ) {
             bytes1 action = value[pos]; pos++;

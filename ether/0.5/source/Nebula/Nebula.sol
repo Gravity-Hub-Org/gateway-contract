@@ -1,4 +1,4 @@
-pragma solidity ^0.7.0;
+pragma solidity ^0.5;
 
 import "../Gravity/Gravity.sol";
 import "../libs/Queue.sol";
@@ -35,7 +35,7 @@ contract Nebula {
         gravityContract = newGravityContract;
     }
     
-    receive() external payable { } 
+    function receive() external payable { } 
 
     //----------------------------------public getters--------------------------------------------------------------
 

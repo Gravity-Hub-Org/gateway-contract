@@ -1,4 +1,4 @@
-pragma solidity ^0.7;
+pragma solidity ^0.5;
 
 library Models {
     struct Score {
